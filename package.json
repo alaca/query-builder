@@ -1,0 +1,30 @@
+{
+  "name": "@antelaca/querybuilder",
+  "version": "1.0.0",
+  "description": "Query Builder",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alaca/querybuilder.git"
+  },
+  "keywords": [
+    "SQL",
+    "Query Builder"
+  ],
+  "author": "Ante Laca <ante.laca@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alaca/querybuilder/issues"
+  },
+  "homepage": "https://github.com/alaca/querybuilder#readme",
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
+    "sqlite": "^4.1.1",
+    "typescript": "^4.7.4"
+  }
+}
