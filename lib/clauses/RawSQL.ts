@@ -1,7 +1,7 @@
 export class RawSQL {
-    sql: string;
+  sql: string;
 
-    constructor(sql: string, args?: Array<string | number>) {
-        this.sql = args?.length ? 'sss' : sql;
-    }
+  constructor(sql: string, args?: Array<string | number>) {
+    this.sql = args?.length ? 'sss' : sql;
+  }
 }

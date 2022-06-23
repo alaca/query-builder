@@ -7,45 +7,55 @@ import {QueryBuilder} from './QueryBuilder';
  */
 export class Database {
 
-    constructor() {
+  constructor() {
 
-    }
+  }
 
-    /**
-     * @param {string} table table name
-     * @return QueryBuilder
-     */
-    table(table: string): QueryBuilder {
-        return (new QueryBuilder()).from(table);
-    }
+  /**
+   * @param {string} table table name
+   * @return QueryBuilder
+   */
+  table(table: string): QueryBuilder {
+    return (new QueryBuilder()).from(table);
+  }
 
-    query() {
+  query() {
 
-    }
+  }
 
-    prepare() {
+  prepare() {
 
-    }
+  }
 
-    get() {
+  get() {
 
-    }
+  }
 
-    getAll() {
+  getAll() {
 
-    }
+  }
 }
-
 
 
 const query = new QueryBuilder();
 
 const l = query
-    .select('id')
-    .from('table')
-    .where('id', 5)
-    .orWhere('ajme', 'nije')
-    .whereBetween('date', 'danas', 'sutra')
-    .getSQL();
+  .distinct()
+  .select('id', 'pid', 'uuid')
+  .from('table')
+  .where('id', 5)
+  .where((builder) => {
+    builder
+      .where('aa', 4)
+      .orWhere('bee', 6);
+  })
+  .orWhere( 'id', (builder) => {
+    builder
+      .where('22', 4)
+      .orWhere('33', 6);
+  })
+  .orWhere('ajme', 'nije')
+  .whereBetween('date', 'danas', 'sutra')
+  .getSQL();
 
 console.log(l)
