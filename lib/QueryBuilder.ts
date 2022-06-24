@@ -10,13 +10,20 @@ import {
 } from '../types';
 
 export class QueryBuilder {
+  private compiler: QueryCompiler;
   private selects: (Select | RawSQL)[] = [];
   private tables: (From | RawSQL)[] = [];
   private wheres: (Where | RawSQL | string)[] = [];
   private distinctSelect: boolean = false;
 
+  constructor() {
+    this.compiler = new QueryCompiler(this);
+  }
+
   from(table: string, alias?: string) {
-    this.tables.push(new From(table, alias));
+    this.tables.push(
+      new From(table, alias)
+    );
     return this;
   }
 
@@ -24,18 +31,24 @@ export class QueryBuilder {
     columns.map(column => {
       if (column instanceof Object) {
         return Object.entries(column).map(([name, alias]) => {
-          this.selects.push(new Select(name, alias));
+          this.selects.push(
+            new Select(name, alias)
+          );
         });
       }
 
-      this.selects.push(new Select(column));
+      this.selects.push(
+        new Select(column)
+      );
     });
 
     return this;
   }
 
   selectRaw(sql: string, ...args: Array<string | number>) {
-    this.selects.push(new RawSQL(sql, args));
+    this.selects.push(
+      new RawSQL(sql, args)
+    );
     return this;
   }
 
@@ -55,7 +68,7 @@ export class QueryBuilder {
       const builder = new QueryBuilder();
       column(builder);
 
-      const sql = QueryCompiler.getQueryOperator(logicalOperator) + format(
+      const sql = this.compiler.getOperator(logicalOperator) + format(
         '(%s)',
         builder.getWhereSQL(true)
       );
@@ -67,7 +80,7 @@ export class QueryBuilder {
       const builder = new QueryBuilder();
       value(builder);
 
-      const sql = QueryCompiler.getQueryOperator(logicalOperator) + format(
+      const sql = this.compiler.getOperator(logicalOperator) + format(
         '%s %s (%s)',
         column,
         comparisonOperator,
@@ -77,7 +90,12 @@ export class QueryBuilder {
       this.wheres.push(sql);
     } else {
       this.wheres.push(
-        new Where(column, value, comparisonOperator, this.wheres.length ? logicalOperator : null)
+        new Where(
+          column,
+          value,
+          comparisonOperator,
+          this.wheres.length ? logicalOperator : null
+        )
       );
     }
 
@@ -161,15 +179,15 @@ export class QueryBuilder {
   }
 
   private getSelectSQL() {
-    return QueryCompiler.compileSelectStatements(this);
+    return this.compiler.compileSelect();
   }
 
   private getFromSQL() {
-    return QueryCompiler.compileFromClauses(this);
+    return this.compiler.compileFrom();
   }
 
   private getWhereSQL(nestedStatement: boolean = false) {
-    return QueryCompiler.compileWereClauses(this, nestedStatement);
+    return this.compiler.compileWere(nestedStatement);
   }
 
   isDistinct() {

@@ -4,11 +4,17 @@ import {RawSQL, Where} from './clauses';
 import {QueryBuilder} from './QueryBuilder';
 
 export class QueryCompiler {
-  static compileSelectStatements(builder: QueryBuilder) {
+  private builder: QueryBuilder;
+
+  constructor(builder: QueryBuilder) {
+    this.builder = builder;
+  }
+
+  compileSelect() {
     let statements: string[] = [];
     let includeSelectKeyword: boolean = true;
 
-    builder
+    this.builder
       .getSelects()
       .forEach((select, i) => {
         if (select instanceof RawSQL) {
@@ -25,21 +31,23 @@ export class QueryCompiler {
         statements.push(select.column);
       });
 
-    const compiled = statements.length ? statements.join(', ') : '*';
+    const compiled = statements.length
+      ? statements.join(', ')
+      : '*';
 
     if (includeSelectKeyword) {
-      return 'SELECT ' + (builder.isDistinct() ? 'DISTINCT ' : '') + compiled;
+      return 'SELECT ' + (this.builder.isDistinct() ? 'DISTINCT ' : '') + compiled;
     }
 
     return compiled;
   }
 
-  static compileFromClauses(builder: QueryBuilder) {
+  compileFrom() {
     let clauses: string[] = [];
 
-    builder
+    this.builder
       .getFrom()
-      .forEach((from, i) => {
+      .forEach((from) => {
         if (from instanceof RawSQL) {
           return clauses.push(from.sql);
         }
@@ -54,51 +62,24 @@ export class QueryCompiler {
     return 'FROM ' + clauses.join(', ');
   }
 
-  static compileWereClauses(builder: QueryBuilder, nestedStatement: boolean = false) {
+  compileWere(nestedStatement: boolean = false) {
     let clauses: string[] = [];
     let includeWhereKeyword: boolean = true;
 
-    builder
+    this.builder
       .getWheres()
       .forEach((where, i) => {
         if (where instanceof RawSQL) {
           if (i === 0) {
             includeWhereKeyword = false;
           }
-
           return clauses.push(where.sql);
         }
 
         if (where instanceof Where) {
-          switch (where.comparisonOperator) {
-            case 'BETWEEN':
-            case 'NOT BETWEEN':
-              return clauses.push(this.getQueryOperator(where.logicalOperator) + format(
-                `%s %s '%s' AND '%s'`,
-                where.column,
-                where.comparisonOperator,
-                where.value[0],
-                where.value[1]
-              ));
-
-            case 'IN':
-            case 'NOT IN':
-              return clauses.push(this.getQueryOperator(where.logicalOperator) + format(
-                `%s %s ('%s')`,
-                where.column,
-                where.comparisonOperator,
-                // @ts-ignore
-                where.value?.join(`','`)
-              ));
-
-            default:
-              return clauses.push(this.getQueryOperator(where.logicalOperator) + format(
-                `%s %s '%s'`,
-                where.column,
-                where.comparisonOperator,
-                where.value
-              ));
-          }
+          return clauses.push(
+            this.compileWhereClause(where)
+          )
         }
 
         clauses.push(where);
@@ -113,7 +94,41 @@ export class QueryCompiler {
     return compiled;
   }
 
-  static getQueryOperator(operator: LogicalOperators): string {
-    return operator ? operator + ' ' : '';
+  private compileWhereClause(where: Where) {
+    switch (where.comparisonOperator) {
+      case 'BETWEEN':
+      case 'NOT BETWEEN':
+        return this.getOperator(where.logicalOperator) + format(
+          `%s %s '%s' AND '%s'`,
+          where.column,
+          where.comparisonOperator,
+          where.value[0],
+          where.value[1]
+        );
+
+      case 'IN':
+      case 'NOT IN':
+        return this.getOperator(where.logicalOperator) + format(
+          `%s %s ('%s')`,
+          where.column,
+          where.comparisonOperator,
+          // @ts-ignore
+          where.value?.join(`','`)
+        );
+
+      default:
+        return this.getOperator(where.logicalOperator) + format(
+          `%s %s '%s'`,
+          where.column,
+          where.comparisonOperator,
+          where.value
+        );
+    }
+  }
+
+  getOperator(operator: LogicalOperators): string {
+    return operator
+      ? operator + ' '
+      : '';
   }
 }
