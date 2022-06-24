@@ -1,3 +1,3 @@
-const database = require('./lib/Database')
+const querybuilder = require('./lib/QueryBuilder')
 
-module.exports = database;
+module.exports = querybuilder;

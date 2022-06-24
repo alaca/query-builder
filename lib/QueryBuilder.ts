@@ -1,28 +1,28 @@
 import {format} from 'node:util';
-import {RawSQL, Select, Where} from './clauses';
+import {RawSQL, Select, From, Where} from './clauses';
+import {QueryCompiler} from './QueryCompiler';
 import {
   DatabaseInstance,
   ColumnAlias,
   ComparisonOperators,
   LogicalOperators,
-  WhereQueryBuilder,
-  WhereQueryBuilderCallback, QueryBuilderCallback
+  WhereQueryBuilderCallback,
+  QueryBuilderCallback
 } from '../types';
-import {QueryCompiler} from "./QueryCompiler";
 
 export class QueryBuilder {
-  private tableName: string;
   private selects: (Select | RawSQL)[] = [];
+  private tables: (From | RawSQL)[] = [];
   private wheres: (Where | RawSQL | string)[] = [];
-  private selectDistinct: boolean = false;
+  private distinctSelect: boolean = false;
   // private database: DatabaseInstance;
   //
   // constructor(database: DatabaseInstance) {
   //     this.database = database;
   // }
 
-  from(table: string) {
-    this.tableName = table;
+  from(table: string, alias?: string) {
+    this.tables.push(new From(table, alias));
     return this;
   }
 
@@ -46,7 +46,7 @@ export class QueryBuilder {
   }
 
   distinct() {
-    this.selectDistinct = true;
+    this.distinctSelect = true;
     return this;
   }
 
@@ -63,9 +63,7 @@ export class QueryBuilder {
 
       const sql = QueryCompiler.getQueryOperator(logicalOperator) + format(
         '(%s)',
-        builder
-          .getWhereSQL()
-          .replace('WHERE ', '') // Remove the starting WHERE keyword for nested statements
+        builder.getWhereSQL(true)
       );
 
       this.wheres.push(sql);
@@ -97,8 +95,7 @@ export class QueryBuilder {
     value: string | number | Array<string | number> | QueryBuilderCallback = null,
     comparisonOperator: ComparisonOperators | LogicalOperators = '='
   ) {
-    this.setWhere(column, value, comparisonOperator, 'AND');
-    return this;
+    return this.setWhere(column, value, comparisonOperator, 'AND');
   }
 
   orWhere(
@@ -106,8 +103,7 @@ export class QueryBuilder {
     value: string | number | Array<string | number> | QueryBuilderCallback = null,
     comparisonOperator: ComparisonOperators | LogicalOperators = '='
   ) {
-    this.setWhere(column, value, comparisonOperator, 'OR');
-    return this;
+    return this.setWhere(column, value, comparisonOperator, 'OR');
   }
 
   whereBetween(
@@ -142,17 +138,66 @@ export class QueryBuilder {
     return this.orWhere(column, [min, max], 'NOT BETWEEN');
   }
 
-  private getSelectSQL() {
-    return QueryCompiler.compileSelectStatements(this.selects, this.selectDistinct);
+  whereIn(
+    column: string,
+    value: Array<string | number> | QueryBuilderCallback = null,
+  ) {
+    return this.where(column, value, 'IN');
   }
 
-  private getWhereSQL() {
-    return QueryCompiler.compileWereClauses(this.wheres);
+  orWhereIn(
+    column: string,
+    value: Array<string | number> | QueryBuilderCallback = null,
+  ) {
+    return this.orWhere(column, value, 'IN');
+  }
+
+  whereNotIn(
+    column: string,
+    value: Array<string | number> | QueryBuilderCallback = null,
+  ) {
+    return this.where(column, value, 'NOT IN');
+  }
+
+  orWhereNotIn(
+    column: string,
+    value: Array<string | number> | QueryBuilderCallback = null,
+  ) {
+    return this.orWhere(column, value, 'NOT IN');
+  }
+
+  private getSelectSQL() {
+    return QueryCompiler.compileSelectStatements(this);
+  }
+
+  private getFromSQL() {
+    return QueryCompiler.compileFromClauses(this);
+  }
+
+  private getWhereSQL(nestedStatement: boolean = false) {
+    return QueryCompiler.compileWereClauses(this, nestedStatement);
+  }
+
+  isDistinct() {
+    return this.distinctSelect
+  }
+
+  getSelects() {
+    return this.selects;
+  }
+
+  getFrom() {
+    return this.tables;
+  }
+
+  getWheres() {
+    return this.wheres;
   }
 
   getSQL() {
     return [
       this.getSelectSQL(),
+      this.getFromSQL(),
       this.getWhereSQL()
     ].join(' ');
   }

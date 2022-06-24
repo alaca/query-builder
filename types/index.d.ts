@@ -69,6 +69,26 @@ interface WhereQueryBuilder {
     min: string | number,
     max: string | number
   ): WhereQueryBuilder
+
+  whereIn(
+    column: string,
+    value: string | number | Array<string | number> | Function,
+  ): WhereQueryBuilder
+
+  orWhereIn(
+    column: string,
+    value: string | number | Array<string | number> | Function,
+  ): WhereQueryBuilder
+
+  whereNotIn(
+    column: string,
+    value: string | number | Array<string | number> | Function,
+  ): WhereQueryBuilder
+
+  orWhereNotIn(
+    column: string,
+    value: string | number | Array<string | number> | Function,
+  ): WhereQueryBuilder
 }
 
 export interface WhereQueryBuilderCallback {
