@@ -2,7 +2,6 @@ import {format} from 'node:util';
 import {RawSQL, Select, From, Where} from './clauses';
 import {QueryCompiler} from './QueryCompiler';
 import {
-  DatabaseInstance,
   ColumnAlias,
   ComparisonOperators,
   LogicalOperators,
@@ -15,11 +14,6 @@ export class QueryBuilder {
   private tables: (From | RawSQL)[] = [];
   private wheres: (Where | RawSQL | string)[] = [];
   private distinctSelect: boolean = false;
-  // private database: DatabaseInstance;
-  //
-  // constructor(database: DatabaseInstance) {
-  //     this.database = database;
-  // }
 
   from(table: string, alias?: string) {
     this.tables.push(new From(table, alias));

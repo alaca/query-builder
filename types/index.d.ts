@@ -1,7 +1,4 @@
-import {Database} from '../lib/Database';
 import {QueryBuilder} from "../lib/QueryBuilder";
-
-export type DatabaseInstance = InstanceType<typeof Database>;
 
 export type ColumnAlias = {
   [key: string]: string
