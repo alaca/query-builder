@@ -97,15 +97,16 @@ export class QueryCompiler {
 
   private compileWhereClause(where: Where) {
     switch (where.comparisonOperator) {
+      case 'LIKE':
+      case 'NOT LIKE':
+        return this.getOperator(where.logicalOperator)
+          // @ts-ignore
+          + `${where.column} ${where.comparisonOperator} ${escapeString(where.value.includes('%') ? where.value : `%${where.value}%`)}`;
+
       case 'BETWEEN':
       case 'NOT BETWEEN':
-        return this.getOperator(where.logicalOperator) + format(
-          `%s %s %s AND %s`,
-          where.column,
-          where.comparisonOperator,
-          escapeString(where.value[0]),
-          escapeString(where.value[1])
-        );
+        return this.getOperator(where.logicalOperator)
+          + `${where.column} ${where.comparisonOperator} ${escapeString(where.value[0])} AND ${escapeString(where.value[0])}`;
 
       case 'IN':
       case 'NOT IN':
@@ -118,12 +119,8 @@ export class QueryCompiler {
         );
 
       default:
-        return this.getOperator(where.logicalOperator) + format(
-          `%s %s %s`,
-          where.column,
-          where.comparisonOperator,
-          escapeString(where.value)
-        );
+        return this.getOperator(where.logicalOperator)
+          + `${where.column} ${where.comparisonOperator} ${escapeString(where.value)}`;
     }
   }
 

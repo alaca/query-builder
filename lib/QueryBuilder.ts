@@ -1,4 +1,3 @@
-import {format} from 'node:util';
 import {RawSQL, Select, From, Where} from './clauses';
 import {QueryCompiler} from './QueryCompiler';
 import {
@@ -68,10 +67,8 @@ export class QueryBuilder {
       const builder = new QueryBuilder();
       column(builder);
 
-      const sql = this.compiler.getOperator(logicalOperator) + format(
-        '(%s)',
-        builder.getWhereSQL(true)
-      );
+      const sql = this.compiler.getOperator(logicalOperator)
+        + `(${builder.getWhereSQL(true)})`;
 
       this.wheres.push(sql);
     }
@@ -80,12 +77,8 @@ export class QueryBuilder {
       const builder = new QueryBuilder();
       value(builder);
 
-      const sql = this.compiler.getOperator(logicalOperator) + format(
-        '%s %s (%s)',
-        column,
-        comparisonOperator,
-        builder.getSQL()
-      );
+      const sql = this.compiler.getOperator(logicalOperator)
+        + `${column} ${comparisonOperator} ${builder.getSQL()}`;
 
       this.wheres.push(sql);
     } else {
