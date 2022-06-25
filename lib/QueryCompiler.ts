@@ -1,4 +1,5 @@
 import {format} from 'node:util';
+import {escapeString} from './util/String';
 import {LogicalOperators} from '../types';
 import {RawSQL, Where} from './clauses';
 import {QueryBuilder} from './QueryBuilder';
@@ -99,11 +100,11 @@ export class QueryCompiler {
       case 'BETWEEN':
       case 'NOT BETWEEN':
         return this.getOperator(where.logicalOperator) + format(
-          `%s %s '%s' AND '%s'`,
+          `%s %s %s AND %s`,
           where.column,
           where.comparisonOperator,
-          where.value[0],
-          where.value[1]
+          escapeString(where.value[0]),
+          escapeString(where.value[1])
         );
 
       case 'IN':
@@ -118,10 +119,10 @@ export class QueryCompiler {
 
       default:
         return this.getOperator(where.logicalOperator) + format(
-          `%s %s '%s'`,
+          `%s %s %s`,
           where.column,
           where.comparisonOperator,
-          where.value
+          escapeString(where.value)
         );
     }
   }

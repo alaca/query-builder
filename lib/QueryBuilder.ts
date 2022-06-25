@@ -104,7 +104,7 @@ export class QueryBuilder {
 
   where(
     column: string | WhereQueryBuilderCallback,
-    value: string | number | Array<string | number> | QueryBuilderCallback = null,
+    value: string | number | QueryBuilderCallback = null,
     comparisonOperator: ComparisonOperators | LogicalOperators = '='
   ) {
     return this.setWhere(column, value, comparisonOperator, 'AND');
@@ -112,10 +112,26 @@ export class QueryBuilder {
 
   orWhere(
     column: string | WhereQueryBuilderCallback,
-    value: string | number | Array<string | number> | QueryBuilderCallback = null,
+    value: string | number | QueryBuilderCallback = null,
     comparisonOperator: ComparisonOperators | LogicalOperators = '='
   ) {
     return this.setWhere(column, value, comparisonOperator, 'OR');
+  }
+
+  whereLike(column: string, value: string) {
+    return this.where(column, value, 'LIKE');
+  }
+
+  orWhereLike(column: string, value: string) {
+    return this.orWhere(column, value, 'LIKE');
+  }
+
+  whereNotLike(column: string, value: string) {
+    return this.where(column, value, 'NOT LIKE');
+  }
+
+  orWhereNotLike(column: string, value: string) {
+    return this.orWhere(column, value, 'NOT LIKE');
   }
 
   whereBetween(
@@ -123,7 +139,7 @@ export class QueryBuilder {
     min: string | number,
     max: string | number
   ) {
-    return this.where(column, [min, max], 'BETWEEN');
+    return this.setWhere(column, [min, max], 'BETWEEN', 'AND');
   }
 
   whereNotBetween(
@@ -131,7 +147,7 @@ export class QueryBuilder {
     min: string | number,
     max: string | number
   ) {
-    return this.where(column, [min, max], 'NOT BETWEEN');
+    return this.setWhere(column, [min, max], 'NOT BETWEEN', 'AND');
   }
 
   orWhereBetween(
@@ -139,7 +155,7 @@ export class QueryBuilder {
     min: string | number,
     max: string | number
   ) {
-    return this.orWhere(column, [min, max], 'BETWEEN');
+    return this.setWhere(column, [min, max], 'BETWEEN', 'OR');
   }
 
   orWhereNotBetween(
@@ -147,35 +163,51 @@ export class QueryBuilder {
     min: string | number,
     max: string | number
   ) {
-    return this.orWhere(column, [min, max], 'NOT BETWEEN');
+    return this.setWhere(column, [min, max], 'NOT BETWEEN', 'OR');
   }
 
   whereIn(
     column: string,
-    value: Array<string | number> | QueryBuilderCallback = null,
+    value: Array<string | number> | QueryBuilderCallback = null
   ) {
-    return this.where(column, value, 'IN');
+    return this.setWhere(column, value, 'IN', 'AND');
   }
 
   orWhereIn(
     column: string,
-    value: Array<string | number> | QueryBuilderCallback = null,
+    value: Array<string | number> | QueryBuilderCallback = null
   ) {
-    return this.orWhere(column, value, 'IN');
+    return this.setWhere(column, value, 'IN', 'OR');
   }
 
   whereNotIn(
     column: string,
-    value: Array<string | number> | QueryBuilderCallback = null,
+    value: Array<string | number> | QueryBuilderCallback = null
   ) {
-    return this.where(column, value, 'NOT IN');
+    return this.setWhere(column, value, 'NOT IN', 'AND');
   }
 
   orWhereNotIn(
     column: string,
-    value: Array<string | number> | QueryBuilderCallback = null,
+    value: Array<string | number> | QueryBuilderCallback = null
   ) {
-    return this.orWhere(column, value, 'NOT IN');
+    return this.setWhere(column, value, 'NOT IN', 'OR');
+  }
+
+  whereIsNull(column: string) {
+    return this.where(column, null, 'IS NULL');
+  }
+
+  orWhereIsNull(column: string) {
+    return this.orWhere(column, null, 'IS NULL');
+  }
+
+  whereIsNotNull(column: string) {
+    return this.where(column, null, 'IS NOT NULL');
+  }
+
+  orWhereIsNotNull(column: string) {
+    return this.orWhere(column, null, 'IS NOT NULL');
   }
 
   private getSelectSQL() {
