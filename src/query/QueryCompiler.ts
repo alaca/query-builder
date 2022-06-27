@@ -1,8 +1,9 @@
 import {format} from 'node:util';
-import {escapeString} from './util/String';
+import {escapeString} from '../util/string';
 import {LogicalOperators} from '../types';
-import {RawSQL, Where} from './clauses';
-import {QueryBuilder} from './QueryBuilder';
+import {Join, RawSQL, Where} from './clauses';
+import QueryBuilder from './QueryBuilder';
+import JoinQueryBuilder from './JoinQueryBuilder';
 
 export class QueryCompiler {
   private builder: QueryBuilder;
@@ -16,7 +17,7 @@ export class QueryCompiler {
     let includeSelectKeyword: boolean = true;
 
     this.builder
-      .getSelects()
+      .selects
       .forEach((select, i) => {
         if (select instanceof RawSQL) {
           if (i === 0) {
@@ -37,7 +38,7 @@ export class QueryCompiler {
       : '*';
 
     if (includeSelectKeyword) {
-      return 'SELECT ' + (this.builder.isDistinct() ? 'DISTINCT ' : '') + compiled;
+      return 'SELECT ' + (this.builder.distinctSelect ? 'DISTINCT ' : '') + compiled;
     }
 
     return compiled;
@@ -47,7 +48,7 @@ export class QueryCompiler {
     let clauses: string[] = [];
 
     this.builder
-      .getFrom()
+      .tables
       .forEach((from) => {
         if (from instanceof RawSQL) {
           return clauses.push(from.sql);
@@ -68,7 +69,7 @@ export class QueryCompiler {
     let includeWhereKeyword: boolean = true;
 
     this.builder
-      .getWheres()
+      .wheres
       .forEach((where, i) => {
         if (where instanceof RawSQL) {
           if (i === 0) {
@@ -105,8 +106,10 @@ export class QueryCompiler {
 
       case 'BETWEEN':
       case 'NOT BETWEEN':
+        // @ts-ignore
+        const [min, max] = where.value;
         return this.getOperator(where.logicalOperator)
-          + `${where.column} ${where.comparisonOperator} ${escapeString(where.value[0])} AND ${escapeString(where.value[0])}`;
+          + `${where.column} ${where.comparisonOperator} ${escapeString(min)} AND ${escapeString(max)}`;
 
       case 'IN':
       case 'NOT IN':
@@ -124,7 +127,84 @@ export class QueryCompiler {
     }
   }
 
-  getOperator(operator: LogicalOperators): string {
+  compileJoin() {
+    let clauses: string[] = [];
+
+    if (!this.builder.joins.length) {
+      return '';
+    }
+
+    this.builder
+      .joins
+      .forEach((callback) => {
+        if (callback instanceof RawSQL) {
+          return clauses.push(callback.sql);
+        }
+
+        const builder = new JoinQueryBuilder();
+        callback(builder);
+
+        // Handle callbacks
+        builder
+          .joins
+          .forEach(join => {
+            if (join instanceof RawSQL) {
+              return clauses.push(join.sql);
+            }
+
+            if (join instanceof Join) {
+              if (join.alias) {
+                return clauses.push(
+                  `${join.type} JOIN ${join.table} ${join.alias}`
+                )
+              }
+
+              return clauses.push(
+                `${join.type} JOIN ${join.table}`
+              )
+            }
+
+            clauses.push(
+              `${join.logicalOperator} ${join.column1} ${join.comparisonOperator} ${join.quote ? escapeString(join.column2) : join.column2}`
+            );
+          });
+
+      });
+
+    return clauses.join(' ');
+  }
+
+  compileGroupBy() {
+    let statements: string[] = [];
+    let includeGroupByKeyword: boolean = true;
+
+    if (!this.builder.groupByColumns.length) {
+      return '';
+    }
+
+    this.builder
+      .groupByColumns
+      .forEach((group, i) => {
+        if (group instanceof RawSQL) {
+          if (i === 0) {
+            includeGroupByKeyword = false;
+          }
+          return statements.push(group.sql);
+        }
+
+        statements.push(group.trim());
+      });
+
+    const compiled = statements.join(', ');
+
+    if (includeGroupByKeyword) {
+      return 'GROUP BY ' + compiled;
+    }
+
+    return compiled;
+  }
+
+  getOperator(operator: LogicalOperators | null): string {
     return operator
       ? operator + ' '
       : '';

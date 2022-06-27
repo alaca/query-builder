@@ -1,22 +1,29 @@
-import {RawSQL, Select, From, Where} from './clauses';
+import {From, RawSQL, Select, Where} from './clauses';
 import {QueryCompiler} from './QueryCompiler';
+import JoinQueryBuilder from './JoinQueryBuilder';
 import {
   ColumnAlias,
   ComparisonOperators,
   LogicalOperators,
+  QueryBuilderCallback,
   WhereQueryBuilderCallback,
-  QueryBuilderCallback
+  JoinQueryBuilderCallback,
+  QueryBuilder as QueryBuilderInterface
 } from '../types';
 
-export class QueryBuilder {
-  private compiler: QueryCompiler;
-  private selects: (Select | RawSQL)[] = [];
-  private tables: (From | RawSQL)[] = [];
-  private wheres: (Where | RawSQL | string)[] = [];
-  private distinctSelect: boolean = false;
+export default class QueryBuilder implements QueryBuilderInterface {
+  compiler: QueryCompiler;
+  joinBuilder: JoinQueryBuilder;
+  selects: (Select | RawSQL)[] = [];
+  tables: (From | RawSQL)[] = [];
+  wheres: (Where | RawSQL | string)[] = [];
+  joins: (RawSQL | JoinQueryBuilderCallback)[] = [];
+  groupByColumns: (RawSQL | string)[] = [];
+  distinctSelect: boolean = false;
 
   constructor() {
     this.compiler = new QueryCompiler(this);
+    this.joinBuilder = new JoinQueryBuilder();
   }
 
   from(table: string, alias?: string) {
@@ -58,7 +65,7 @@ export class QueryBuilder {
 
   private setWhere(
     column: string | Function,
-    value: string | number | null | Array<string | number> | Function,
+    value: string | number | undefined | Array<string | number> | Function,
     comparisonOperator: ComparisonOperators | LogicalOperators,
     logicalOperator: LogicalOperators
   ) {
@@ -67,8 +74,8 @@ export class QueryBuilder {
       const builder = new QueryBuilder();
       column(builder);
 
-      const sql = this.compiler.getOperator(logicalOperator)
-        + `(${builder.getWhereSQL(true)})`;
+      const sql = (this.wheres.length > 0 ? this.compiler.getOperator(logicalOperator) : '')
+        + `(${builder.compiler.compileWere(true)})`;
 
       this.wheres.push(sql);
     }
@@ -77,8 +84,8 @@ export class QueryBuilder {
       const builder = new QueryBuilder();
       value(builder);
 
-      const sql = this.compiler.getOperator(logicalOperator)
-        + `${column} ${comparisonOperator} ${builder.getSQL()}`;
+      const sql = (this.wheres.length > 0 ? this.compiler.getOperator(logicalOperator) : '')
+        + `${column} ${comparisonOperator} (${builder.getSQL()})`;
 
       this.wheres.push(sql);
     } else {
@@ -97,7 +104,7 @@ export class QueryBuilder {
 
   where(
     column: string | WhereQueryBuilderCallback,
-    value: string | number | QueryBuilderCallback = null,
+    value: string | number | QueryBuilderCallback | undefined = undefined,
     comparisonOperator: ComparisonOperators | LogicalOperators = '='
   ) {
     return this.setWhere(column, value, comparisonOperator, 'AND');
@@ -105,7 +112,7 @@ export class QueryBuilder {
 
   orWhere(
     column: string | WhereQueryBuilderCallback,
-    value: string | number | QueryBuilderCallback = null,
+    value: string | number | QueryBuilderCallback | undefined = undefined,
     comparisonOperator: ComparisonOperators | LogicalOperators = '='
   ) {
     return this.setWhere(column, value, comparisonOperator, 'OR');
@@ -161,81 +168,134 @@ export class QueryBuilder {
 
   whereIn(
     column: string,
-    value: Array<string | number> | QueryBuilderCallback = null
+    value: Array<string | number> | QueryBuilderCallback
   ) {
     return this.setWhere(column, value, 'IN', 'AND');
   }
 
   orWhereIn(
     column: string,
-    value: Array<string | number> | QueryBuilderCallback = null
+    value: Array<string | number> | QueryBuilderCallback
   ) {
     return this.setWhere(column, value, 'IN', 'OR');
   }
 
   whereNotIn(
     column: string,
-    value: Array<string | number> | QueryBuilderCallback = null
+    value: Array<string | number> | QueryBuilderCallback
   ) {
     return this.setWhere(column, value, 'NOT IN', 'AND');
   }
 
   orWhereNotIn(
     column: string,
-    value: Array<string | number> | QueryBuilderCallback = null
+    value: Array<string | number> | QueryBuilderCallback
   ) {
     return this.setWhere(column, value, 'NOT IN', 'OR');
   }
 
   whereIsNull(column: string) {
-    return this.where(column, null, 'IS NULL');
+    return this.where(column, undefined, 'IS NULL');
   }
 
   orWhereIsNull(column: string) {
-    return this.orWhere(column, null, 'IS NULL');
+    return this.orWhere(column, undefined, 'IS NULL');
   }
 
   whereIsNotNull(column: string) {
-    return this.where(column, null, 'IS NOT NULL');
+    return this.where(column, undefined, 'IS NOT NULL');
   }
 
   orWhereIsNotNull(column: string) {
-    return this.orWhere(column, null, 'IS NOT NULL');
+    return this.orWhere(column, undefined, 'IS NOT NULL');
   }
 
-  private getSelectSQL() {
-    return this.compiler.compileSelect();
+  whereRaw(sql: string, ...args: Array<string | number>) {
+    this.wheres.push(
+      new RawSQL(sql, args)
+    );
+    return this;
   }
 
-  private getFromSQL() {
-    return this.compiler.compileFrom();
+  join(join: JoinQueryBuilderCallback) {
+    this.joins.push(join);
+
+    return this;
   }
 
-  private getWhereSQL(nestedStatement: boolean = false) {
-    return this.compiler.compileWere(nestedStatement);
+  leftJoin(
+    table: string,
+    column1: string,
+    column2: string,
+    alias: string | undefined = undefined
+  ) {
+    return this.join(builder => {
+      builder
+        .leftJoin(table, alias)
+        .on(column1, column2)
+    });
   }
 
-  isDistinct() {
-    return this.distinctSelect
+  rightJoin(
+    table: string,
+    column1: string,
+    column2: string,
+    alias: string | undefined = undefined
+  ) {
+    return this.join(builder => {
+      builder
+        .rightJoin(table, alias)
+        .on(column1, column2)
+    });
   }
 
-  getSelects() {
-    return this.selects;
+  innerJoin(
+    table: string,
+    column1: string,
+    column2: string,
+    alias: string | undefined = undefined
+  ) {
+    return this.join(builder => {
+      builder
+        .innerJoin(table, alias)
+        .on(column1, column2)
+    });
   }
 
-  getFrom() {
-    return this.tables;
+  joinRaw(sql: string, ...args: Array<string | number>) {
+    this.joins.push(
+      new RawSQL(sql, args)
+    );
+    return this;
   }
 
-  getWheres() {
-    return this.wheres;
+  groupBy(column: string) {
+    if (!this.groupByColumns.includes(column)) {
+      this.groupByColumns.push(column.trim())
+    }
+
+    return this;
+  }
+
+  groupByRaw(sql: string, ...args: Array<string | number>) {
+    this.groupByColumns.push(
+      new RawSQL(sql, args)
+    )
+
+    return this;
   }
 
   getSQL() {
-    return [
-      this.getSelectSQL(),
-      this.getFromSQL(),
-      this.getWhereSQL()
-    ].join(' ');
+    const sql = [
+      this.compiler.compileSelect(),
+      this.compiler.compileFrom(),
+      this.compiler.compileJoin(),
+      this.compiler.compileWere(),
+      this.compiler.compileGroupBy()
+    ];
+
+    return sql
+      .join(' ')
+      .trim();
   }
 }

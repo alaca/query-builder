@@ -2,13 +2,13 @@ import {ComparisonOperators, LogicalOperators} from '../../types';
 
 export class Where {
   column: string;
-  value: string | number | Array<string | number>;
+  value: string | number | Array<string | number> | undefined;
   comparisonOperator: ComparisonOperators | LogicalOperators;
   logicalOperator: LogicalOperators | null;
 
   constructor(
     column: string,
-    value: string | number | Array<string | number>,
+    value: string | number | Array<string | number> | undefined,
     comparisonOperator: ComparisonOperators | LogicalOperators,
     logicalOperator: LogicalOperators | null
   ) {
