@@ -1,7 +1,7 @@
-const Database = require('./lib/database/Database')
-const QueryBuilder = require('./lib/query/QueryBuilder')
+import Database from './database/Database';
+import QueryBuilder from './query/QueryBuilder';
 
-module.exports = {
+export{
   Database,
   QueryBuilder
 };
