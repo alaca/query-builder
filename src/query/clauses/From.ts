@@ -1,8 +1,8 @@
 export class From {
   table: string;
-  alias: string;
+  alias: string | undefined;
 
-  constructor(table: string, alias?: string | null) {
+  constructor(table: string, alias?: string | undefined) {
     this.table = table.trim();
     this.alias = alias?.trim();
   }
