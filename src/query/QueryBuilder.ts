@@ -295,6 +295,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
     ];
 
     return sql
+      .filter(Boolean)
       .join(' ')
       .trim();
   }
