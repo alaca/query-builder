@@ -1,40 +1,8 @@
 import {Join, JoinCondition, RawSQL} from './clauses';
-import {ComparisonOperators, JoinOperators, JoinQueryBuilderInterface, JoinTypes} from '../types';
+import {ComparisonOperators, JoinQueryBuilderInterface} from '../types';
 
 export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
   joins: (Join | JoinCondition | RawSQL)[] = [];
-
-  private join(
-    type: JoinTypes,
-    table: string,
-    alias: string | undefined = undefined
-  ) {
-    this.joins.push(
-      new Join(type, table, alias)
-    );
-
-    return this;
-  }
-
-  private joinCondition(
-    operator: JoinOperators,
-    column1: string,
-    column2: string,
-    comparisonOperator: ComparisonOperators = '=',
-    quoteValue: boolean
-  ) {
-    this.joins.push(
-      new JoinCondition(
-        operator,
-        column1,
-        column2,
-        comparisonOperator,
-        quoteValue
-      )
-    );
-
-    return this;
-  }
 
   on(
     column1: string,
