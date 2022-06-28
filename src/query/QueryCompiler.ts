@@ -68,6 +68,10 @@ export class QueryCompiler {
     let clauses: string[] = [];
     let includeWhereKeyword: boolean = true;
 
+    if (!this.builder.wheres.length) {
+      return null;
+    }
+
     this.builder
       .wheres
       .forEach((where, i) => {
@@ -131,7 +135,7 @@ export class QueryCompiler {
     let clauses: string[] = [];
 
     if (!this.builder.joins.length) {
-      return '';
+      return null;
     }
 
     this.builder
@@ -179,7 +183,7 @@ export class QueryCompiler {
     let includeGroupByKeyword: boolean = true;
 
     if (!this.builder.groupByColumns.length) {
-      return '';
+      return null;
     }
 
     this.builder
