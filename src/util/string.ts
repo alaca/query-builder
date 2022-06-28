@@ -1,5 +1,7 @@
 const CHARS_REGEXP = /[\0\b\t\n\r\x1a\"\'\\]/g;
-const CHARS_MAP = {
+const CHARS_MAP: {
+  [key: string]: string
+} = {
   '\0': '\\0',
   '\b': '\\b',
   '\t': '\\t',
@@ -11,10 +13,10 @@ const CHARS_MAP = {
   '\\': '\\\\'
 };
 
-export function escapeString(val) {
+export function escapeString(val: any) {
   let index: number = CHARS_REGEXP.lastIndex = 0;
   let escaped: string = '';
-  let match: RegExpExecArray;
+  let match: RegExpExecArray | null;
 
   if (val === null || val === undefined) {
     return 'NULL';
