@@ -1,5 +1,5 @@
-import {default as Builder} from '../query/QueryBuilder';
-import {DatabaseConfig, QueryBuilder} from '../../types';
+import QueryBuilder from '../query/QueryBuilder';
+import {DatabaseConfig} from '../../types';
 
 export default class Database {
   #builder: QueryBuilder & {
@@ -12,7 +12,7 @@ export default class Database {
     // Connect to database
 
     this.#builder = Object.assign(
-      new Builder(),
+      new QueryBuilder(),
       {
         get: () => this.get(),
         getAll: () => this.getAll()
