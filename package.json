@@ -1,7 +1,7 @@
 {
-  "name": "@antelaca/querybuilder",
+  "name": "the-query-builder",
   "version": "1.1.4",
-  "description": "Query Builder",
+  "description": "SQL Query Builder",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
