@@ -9,7 +9,7 @@ import {
   WhereQueryBuilderCallback,
   JoinQueryBuilderCallback,
   QueryBuilder as QueryBuilderInterface
-} from '../types';
+} from '../../types';
 
 export default class QueryBuilder implements QueryBuilderInterface {
   #compiler: QueryCompiler;

@@ -1,5 +1,5 @@
 import {Join, JoinCondition, RawSQL} from './clauses';
-import {ComparisonOperators, JoinQueryBuilderInterface} from '../types';
+import {ComparisonOperators, JoinQueryBuilderInterface} from '../../types';
 
 export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
   #joins: (Join | JoinCondition | RawSQL)[] = [];

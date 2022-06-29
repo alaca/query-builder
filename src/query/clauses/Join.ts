@@ -1,4 +1,4 @@
-import {JoinTypes} from '../../types';
+import {JoinTypes} from '../../../types';
 
 export class Join {
   table: string;

@@ -1,6 +1,6 @@
 import {format} from 'node:util';
 import {escapeString} from '../util/string';
-import {LogicalOperators} from '../types';
+import {LogicalOperators} from '../../types';
 import {Join, RawSQL, Where} from './clauses';
 import QueryBuilder from './QueryBuilder';
 import JoinQueryBuilder from './JoinQueryBuilder';
