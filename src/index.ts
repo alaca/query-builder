@@ -1,1 +1,1 @@
-export * from './QueryBuilder';
+export {default as QueryBuilder} from './QueryBuilder';
