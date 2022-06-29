@@ -1,4 +1,4 @@
-type DatabaseConfig = {
+export type DatabaseConfig = {
   client: string
 }
 
