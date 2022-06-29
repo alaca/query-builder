@@ -1,5 +1,5 @@
 import {default as Builder} from '../query/QueryBuilder';
-import {DatabaseConfig, QueryBuilder} from '../types';
+import {DatabaseConfig, QueryBuilder} from '../../types';
 
 export default class Database {
   #builder: QueryBuilder & {
