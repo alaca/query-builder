@@ -8,9 +8,10 @@ import {
   QueryBuilderCallback,
   WhereQueryBuilderCallback,
   JoinQueryBuilderCallback,
+  QueryBuilder as QueryBuilderInterface
 } from '../../types';
 
-export default class QueryBuilder {
+export default class QueryBuilder implements QueryBuilderInterface {
   #compiler: QueryCompiler;
   #joinBuilder: JoinQueryBuilder;
   #selects: (Select | RawSQL)[] = [];
