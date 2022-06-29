@@ -2,7 +2,7 @@ import {default as Builder} from '../query/QueryBuilder';
 import {DatabaseConfig, QueryBuilder} from '../types';
 
 export default class Database {
-  private builder: QueryBuilder & {
+  #builder: QueryBuilder & {
     get: () => Promise<void>;
     getAll: () => Promise<void>;
   };
@@ -11,7 +11,7 @@ export default class Database {
 
     // Connect to database
 
-    this.builder = Object.assign(
+    this.#builder = Object.assign(
       new Builder(),
       {
         get: () => this.get(),
@@ -21,7 +21,7 @@ export default class Database {
   }
 
   table(table: string) {
-    return this.builder.from(table);
+    return this.#builder.from(table);
   }
 
   async query(sql: string, args?: (string | number)[]) {
@@ -29,11 +29,11 @@ export default class Database {
   }
 
   async get() {
-    const sql = this.builder.getSQL();
+    const sql = this.#builder.getSQL();
   }
 
   async getAll() {
-    const sql = this.builder.getSQL();
+    const sql = this.#builder.getSQL();
   }
 }
 
