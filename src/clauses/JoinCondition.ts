@@ -1,4 +1,4 @@
-import {ComparisonOperators, JoinOperators} from '../../../types';
+import {ComparisonOperators, JoinOperators} from '../../types';
 
 export class JoinCondition {
   logicalOperator: string;

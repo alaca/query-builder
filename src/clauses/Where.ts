@@ -1,4 +1,4 @@
-import {ComparisonOperators, LogicalOperators} from '../../../types';
+import {ComparisonOperators, LogicalOperators} from '../../types';
 
 export class Where {
   column: string;
