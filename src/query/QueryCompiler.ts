@@ -6,18 +6,18 @@ import QueryBuilder from './QueryBuilder';
 import JoinQueryBuilder from './JoinQueryBuilder';
 
 export class QueryCompiler {
-  private builder: QueryBuilder;
+  #builder: QueryBuilder;
 
   constructor(builder: QueryBuilder) {
-    this.builder = builder;
+    this.#builder = builder;
   }
 
   compileSelect() {
     let statements: string[] = [];
     let includeSelectKeyword: boolean = true;
 
-    this.builder
-      .selects
+    this.#builder
+      .getSelects()
       .forEach((select, i) => {
         if (select instanceof RawSQL) {
           if (i === 0) {
@@ -38,7 +38,7 @@ export class QueryCompiler {
       : '*';
 
     if (includeSelectKeyword) {
-      return 'SELECT ' + (this.builder.distinctSelect ? 'DISTINCT ' : '') + compiled;
+      return 'SELECT ' + (this.#builder.isDistinct() ? 'DISTINCT ' : '') + compiled;
     }
 
     return compiled;
@@ -47,8 +47,8 @@ export class QueryCompiler {
   compileFrom() {
     let clauses: string[] = [];
 
-    this.builder
-      .tables
+    this.#builder
+      .getTables()
       .forEach((from) => {
         if (from instanceof RawSQL) {
           return clauses.push(from.sql);
@@ -68,12 +68,12 @@ export class QueryCompiler {
     let clauses: string[] = [];
     let includeWhereKeyword: boolean = true;
 
-    if (!this.builder.wheres.length) {
+    if (!this.#builder.getWheres().length) {
       return null;
     }
 
-    this.builder
-      .wheres
+    this.#builder
+      .getWheres()
       .forEach((where, i) => {
         if (where instanceof RawSQL) {
           if (i === 0) {
@@ -134,12 +134,12 @@ export class QueryCompiler {
   compileJoin() {
     let clauses: string[] = [];
 
-    if (!this.builder.joins.length) {
+    if (!this.#builder.getJoins().length) {
       return null;
     }
 
-    this.builder
-      .joins
+    this.#builder
+      .getJoins()
       .forEach((callback) => {
         if (callback instanceof RawSQL) {
           return clauses.push(callback.sql);
@@ -150,7 +150,7 @@ export class QueryCompiler {
 
         // Handle callbacks
         builder
-          .joins
+          .getJoins()
           .forEach(join => {
             if (join instanceof RawSQL) {
               return clauses.push(join.sql);
@@ -182,12 +182,12 @@ export class QueryCompiler {
     let statements: string[] = [];
     let includeGroupByKeyword: boolean = true;
 
-    if (!this.builder.groupByColumns.length) {
+    if (!this.#builder.getGroupBy().length) {
       return null;
     }
 
-    this.builder
-      .groupByColumns
+    this.#builder
+      .getGroupBy()
       .forEach((group, i) => {
         if (group instanceof RawSQL) {
           if (i === 0) {

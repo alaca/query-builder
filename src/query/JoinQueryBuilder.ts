@@ -2,7 +2,7 @@ import {Join, JoinCondition, RawSQL} from './clauses';
 import {ComparisonOperators, JoinQueryBuilderInterface} from '../types';
 
 export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
-  joins: (Join | JoinCondition | RawSQL)[] = [];
+  #joins: (Join | JoinCondition | RawSQL)[] = [];
 
   on(
     column1: string,
@@ -10,7 +10,7 @@ export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
     comparisonOperator: ComparisonOperators = '=',
     quoteValue: boolean = false
   ) {
-    this.joins.push(
+    this.#joins.push(
       new JoinCondition(
         'ON',
         column1,
@@ -29,7 +29,7 @@ export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
     comparisonOperator: ComparisonOperators = '=',
     quoteValue: boolean = true
   ) {
-    this.joins.push(
+    this.#joins.push(
       new JoinCondition(
         'AND',
         column1,
@@ -48,7 +48,7 @@ export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
     comparisonOperator: ComparisonOperators = '=',
     quoteValue: boolean = true
   ) {
-    this.joins.push(
+    this.#joins.push(
       new JoinCondition(
         'OR',
         column1,
@@ -62,7 +62,7 @@ export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
   }
 
   leftJoin(table: string, alias: string | undefined = undefined) {
-    this.joins.push(
+    this.#joins.push(
       new Join('LEFT', table, alias)
     );
 
@@ -70,7 +70,7 @@ export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
   }
 
   rightJoin(table: string, alias: string | undefined = undefined) {
-    this.joins.push(
+    this.#joins.push(
       new Join('RIGHT', table, alias)
     );
 
@@ -78,7 +78,7 @@ export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
   }
 
   innerJoin(table: string, alias: string | undefined = undefined) {
-    this.joins.push(
+    this.#joins.push(
       new Join('INNER', table, alias)
     );
 
@@ -86,10 +86,14 @@ export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
   }
 
   joinRaw(sql: string, ...args: Array<string | number>) {
-    this.joins.push(
+    this.#joins.push(
       new RawSQL(sql, args)
     );
 
     return this;
+  }
+
+  getJoins() {
+    return this.#joins;
   }
 }

@@ -12,22 +12,22 @@ import {
 } from '../types';
 
 export default class QueryBuilder implements QueryBuilderInterface {
-  compiler: QueryCompiler;
-  joinBuilder: JoinQueryBuilder;
-  selects: (Select | RawSQL)[] = [];
-  tables: (From | RawSQL)[] = [];
-  wheres: (Where | RawSQL | string)[] = [];
-  joins: (RawSQL | JoinQueryBuilderCallback)[] = [];
-  groupByColumns: (RawSQL | string)[] = [];
-  distinctSelect: boolean = false;
+  #compiler: QueryCompiler;
+  #joinBuilder: JoinQueryBuilder;
+  #selects: (Select | RawSQL)[] = [];
+  #tables: (From | RawSQL)[] = [];
+  #wheres: (Where | RawSQL | string)[] = [];
+  #joins: (RawSQL | JoinQueryBuilderCallback)[] = [];
+  #groupByColumns: (RawSQL | string)[] = [];
+  #distinctSelect: boolean = false;
 
   constructor() {
-    this.compiler = new QueryCompiler(this);
-    this.joinBuilder = new JoinQueryBuilder();
+    this.#compiler = new QueryCompiler(this);
+    this.#joinBuilder = new JoinQueryBuilder();
   }
 
   from(table: string, alias?: string) {
-    this.tables.push(
+    this.#tables.push(
       new From(table, alias)
     );
     return this;
@@ -37,13 +37,13 @@ export default class QueryBuilder implements QueryBuilderInterface {
     columns.map(column => {
       if (column instanceof Object) {
         return Object.entries(column).map(([name, alias]) => {
-          this.selects.push(
+          this.#selects.push(
             new Select(name, alias)
           );
         });
       }
 
-      this.selects.push(
+      this.#selects.push(
         new Select(column)
       );
     });
@@ -52,14 +52,14 @@ export default class QueryBuilder implements QueryBuilderInterface {
   }
 
   selectRaw(sql: string, ...args: Array<string | number>) {
-    this.selects.push(
+    this.#selects.push(
       new RawSQL(sql, args)
     );
     return this;
   }
 
   distinct() {
-    this.distinctSelect = true;
+    this.#distinctSelect = true;
     return this;
   }
 
@@ -74,27 +74,27 @@ export default class QueryBuilder implements QueryBuilderInterface {
       const builder = new QueryBuilder();
       column(builder);
 
-      const sql = (this.wheres.length > 0 ? this.compiler.getOperator(logicalOperator) : '')
-        + `(${builder.compiler.compileWere(true)})`;
+      const sql = (this.#wheres.length > 0 ? this.#compiler.getOperator(logicalOperator) : '')
+        + `(${builder.#compiler.compileWere(true)})`;
 
-      this.wheres.push(sql);
+      this.#wheres.push(sql);
     }
     // Sub-select within the query
     else if (value instanceof Function) {
       const builder = new QueryBuilder();
       value(builder);
 
-      const sql = (this.wheres.length > 0 ? this.compiler.getOperator(logicalOperator) : '')
+      const sql = (this.#wheres.length > 0 ? this.#compiler.getOperator(logicalOperator) : '')
         + `${column} ${comparisonOperator} (${builder.getSQL()})`;
 
-      this.wheres.push(sql);
+      this.#wheres.push(sql);
     } else {
-      this.wheres.push(
+      this.#wheres.push(
         new Where(
           column,
           value,
           comparisonOperator,
-          this.wheres.length ? logicalOperator : null
+          this.#wheres.length ? logicalOperator : null
         )
       );
     }
@@ -211,14 +211,14 @@ export default class QueryBuilder implements QueryBuilderInterface {
   }
 
   whereRaw(sql: string, ...args: Array<string | number>) {
-    this.wheres.push(
+    this.#wheres.push(
       new RawSQL(sql, args)
     );
     return this;
   }
 
   join(join: JoinQueryBuilderCallback) {
-    this.joins.push(join);
+    this.#joins.push(join);
 
     return this;
   }
@@ -263,35 +263,59 @@ export default class QueryBuilder implements QueryBuilderInterface {
   }
 
   joinRaw(sql: string, ...args: Array<string | number>) {
-    this.joins.push(
+    this.#joins.push(
       new RawSQL(sql, args)
     );
     return this;
   }
 
   groupBy(column: string) {
-    if (!this.groupByColumns.includes(column)) {
-      this.groupByColumns.push(column.trim())
+    if (!this.#groupByColumns.includes(column)) {
+      this.#groupByColumns.push(column.trim())
     }
 
     return this;
   }
 
   groupByRaw(sql: string, ...args: Array<string | number>) {
-    this.groupByColumns.push(
+    this.#groupByColumns.push(
       new RawSQL(sql, args)
     )
 
     return this;
   }
 
+  isDistinct() {
+    return this.#distinctSelect;
+  }
+
+  getSelects() {
+    return this.#selects;
+  }
+
+  getTables() {
+    return this.#tables;
+  }
+
+  getWheres() {
+    return this.#wheres;
+  }
+
+  getJoins() {
+    return this.#joins;
+  }
+
+  getGroupBy() {
+    return this.#groupByColumns;
+  }
+
   getSQL() {
     const sql = [
-      this.compiler.compileSelect(),
-      this.compiler.compileFrom(),
-      this.compiler.compileJoin(),
-      this.compiler.compileWere(),
-      this.compiler.compileGroupBy()
+      this.#compiler.compileSelect(),
+      this.#compiler.compileFrom(),
+      this.#compiler.compileJoin(),
+      this.#compiler.compileWere(),
+      this.#compiler.compileGroupBy()
     ];
 
     return sql
