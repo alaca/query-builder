@@ -73,3 +73,13 @@ test('inner join alias', () => {
 
   expect(sql).toBe('SELECT * FROM table INNER JOIN another_table at ON id = another_id');
 });
+
+test('join raw', () => {
+  const sql = (new QueryBuilder())
+    .from('table')
+    .joinRaw('LEFT JOIN another_table ON a = b')
+    .getSQL();
+
+  expect(sql).toBe("SELECT * FROM table LEFT JOIN another_table ON a = b");
+});
+
