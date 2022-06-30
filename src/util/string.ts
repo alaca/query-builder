@@ -19,7 +19,7 @@ export function escapeString(val: any) {
   let match: RegExpExecArray | null;
 
   if (val === null || val === undefined) {
-    return 'NULL';
+    return '';
   }
 
   if (Number.isInteger(val)) {
