@@ -174,33 +174,39 @@ export class QueryCompiler {
   }
 
   compileGroupBy() {
-    let statements: string[] = [];
-    let includeGroupByKeyword: boolean = true;
+    return this.#builder._getGroupBy().length
+      ? 'GROUP BY ' + this.#builder._getGroupBy().join(', ')
+      : null;
+  }
 
-    if (!this.#builder._getGroupBy().length) {
+  compileOrderBy() {
+    let statements: string[] = [];
+
+    if (!this.#builder._getOrderBy().length) {
       return null;
     }
 
     this.#builder
-      ._getGroupBy()
-      .forEach((group, i) => {
-        if (group instanceof RawSQL) {
-          if (i === 0) {
-            includeGroupByKeyword = false;
-          }
-          return statements.push(group.sql);
-        }
-
-        statements.push(group.trim());
+      ._getOrderBy()
+      .forEach((order) => {
+        statements.push(
+          `${order.column} ${order.direction}`
+        );
       });
 
-    const compiled = statements.join(', ');
+    return 'ORDER BY ' + statements.join(', ');
+  }
 
-    if (includeGroupByKeyword) {
-      return 'GROUP BY ' + compiled;
-    }
+  compileLimit() {
+    return this.#builder._getLimit()
+      ? 'LIMIT ' + this.#builder._getLimit()
+      : null;
+  }
 
-    return compiled;
+  compileOffset() {
+    return this.#builder._getLimit() && this.#builder._getOffset()
+      ? 'OFFSET ' + this.#builder._getOffset()
+      : null;
   }
 
   getOperator(operator: LogicalOperators | null): string {

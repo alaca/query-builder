@@ -1,4 +1,4 @@
-import {From, RawSQL, Select, Where} from './clauses';
+import {From, RawSQL, Select, Where, OrderBy} from './clauses';
 import {QueryCompiler} from './QueryCompiler';
 import JoinQueryBuilder from './JoinQueryBuilder';
 import {
@@ -8,6 +8,7 @@ import {
   QueryBuilderCallback,
   WhereQueryBuilderCallback,
   JoinQueryBuilderCallback,
+  SortDirection,
   QueryBuilder as QueryBuilderInterface
 } from '../types';
 
@@ -18,8 +19,11 @@ export default class QueryBuilder implements QueryBuilderInterface {
   #tables: (From | RawSQL)[] = [];
   #wheres: (Where | RawSQL | string)[] = [];
   #joins: (RawSQL | JoinQueryBuilderCallback)[] = [];
-  #groupByColumns: (RawSQL | string)[] = [];
+  #groupByColumns: string[] = [];
+  #orderByColumns: OrderBy[] = [];
   #distinctSelect: boolean = false;
+  #limitNumberRows: number | false = false;
+  #offsetValue: number | false = false;
 
   constructor() {
     this.#compiler = new QueryCompiler(this);
@@ -270,18 +274,24 @@ export default class QueryBuilder implements QueryBuilderInterface {
   }
 
   groupBy(column: string) {
-    if (!this.#groupByColumns.includes(column)) {
-      this.#groupByColumns.push(column.trim())
-    }
-
+    this.#groupByColumns.push(column.trim());
     return this;
   }
 
-  groupByRaw(sql: string, ...args: Array<string | number>) {
-    this.#groupByColumns.push(
-      new RawSQL(sql, args)
-    )
+  orderBy(column: string, direction: SortDirection = 'ASC') {
+    this.#orderByColumns.push(
+      new OrderBy(column, direction)
+    );
+    return this;
+  }
 
+  limit(limit: number) {
+    this.#limitNumberRows = limit;
+    return this;
+  }
+
+  offset(offset: number) {
+    this.#offsetValue = offset;
     return this;
   }
 
@@ -309,13 +319,28 @@ export default class QueryBuilder implements QueryBuilderInterface {
     return this.#groupByColumns;
   }
 
+  _getOrderBy() {
+    return this.#orderByColumns;
+  }
+
+  _getLimit() {
+    return this.#limitNumberRows;
+  }
+
+  _getOffset() {
+    return this.#offsetValue;
+  }
+
   getSQL() {
     const sql = [
       this.#compiler.compileSelect(),
       this.#compiler.compileFrom(),
       this.#compiler.compileJoin(),
       this.#compiler.compileWere(),
-      this.#compiler.compileGroupBy()
+      this.#compiler.compileGroupBy(),
+      this.#compiler.compileOrderBy(),
+      this.#compiler.compileLimit(),
+      this.#compiler.compileOffset(),
     ];
 
     return sql
