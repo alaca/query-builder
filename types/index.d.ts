@@ -38,6 +38,13 @@ export type JoinOperators =
 
 export type SortDirection = 'ASC' | 'DESC';
 
+export type MathFunctions =
+  'SUM'
+  | 'MIN'
+  | 'MAX'
+  | 'COUNT'
+  | 'AVG';
+
 export type QueryBuilder = QueryBuilderInterface & WhereQueryBuilderInterface
 
 interface QueryBuilderInterface {
