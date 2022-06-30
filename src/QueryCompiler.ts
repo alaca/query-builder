@@ -16,7 +16,7 @@ export class QueryCompiler {
     let includeSelectKeyword: boolean = true;
 
     this.#builder
-      .getSelects()
+      ._getSelects()
       .forEach((select, i) => {
         if (select instanceof RawSQL) {
           if (i === 0) {
@@ -37,7 +37,7 @@ export class QueryCompiler {
       : '*';
 
     if (includeSelectKeyword) {
-      return 'SELECT ' + (this.#builder.isDistinct() ? 'DISTINCT ' : '') + compiled;
+      return 'SELECT ' + (this.#builder._isDistinct() ? 'DISTINCT ' : '') + compiled;
     }
 
     return compiled;
@@ -47,7 +47,7 @@ export class QueryCompiler {
     let clauses: string[] = [];
 
     this.#builder
-      .getTables()
+      ._getTables()
       .forEach((from) => {
         if (from instanceof RawSQL) {
           return clauses.push(from.sql);
@@ -67,12 +67,12 @@ export class QueryCompiler {
     let clauses: string[] = [];
     let includeWhereKeyword: boolean = true;
 
-    if (!this.#builder.getWheres().length) {
+    if (!this.#builder._getWheres().length) {
       return null;
     }
 
     this.#builder
-      .getWheres()
+      ._getWheres()
       .forEach((where, i) => {
         if (where instanceof RawSQL) {
           if (i === 0) {
@@ -129,12 +129,12 @@ export class QueryCompiler {
   compileJoin() {
     let clauses: string[] = [];
 
-    if (!this.#builder.getJoins().length) {
+    if (!this.#builder._getJoins().length) {
       return null;
     }
 
     this.#builder
-      .getJoins()
+      ._getJoins()
       .forEach((callback) => {
         if (callback instanceof RawSQL) {
           return clauses.push(callback.sql);
@@ -145,7 +145,7 @@ export class QueryCompiler {
 
         // Handle callbacks
         builder
-          .getJoins()
+          ._getJoins()
           .forEach(join => {
             if (join instanceof RawSQL) {
               return clauses.push(join.sql);
@@ -177,12 +177,12 @@ export class QueryCompiler {
     let statements: string[] = [];
     let includeGroupByKeyword: boolean = true;
 
-    if (!this.#builder.getGroupBy().length) {
+    if (!this.#builder._getGroupBy().length) {
       return null;
     }
 
     this.#builder
-      .getGroupBy()
+      ._getGroupBy()
       .forEach((group, i) => {
         if (group instanceof RawSQL) {
           if (i === 0) {

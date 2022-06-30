@@ -285,27 +285,27 @@ export default class QueryBuilder implements QueryBuilderInterface {
     return this;
   }
 
-  isDistinct() {
+  _isDistinct() {
     return this.#distinctSelect;
   }
 
-  getSelects() {
+  _getSelects() {
     return this.#selects;
   }
 
-  getTables() {
+  _getTables() {
     return this.#tables;
   }
 
-  getWheres() {
+  _getWheres() {
     return this.#wheres;
   }
 
-  getJoins() {
+  _getJoins() {
     return this.#joins;
   }
 
-  getGroupBy() {
+  _getGroupBy() {
     return this.#groupByColumns;
   }
 

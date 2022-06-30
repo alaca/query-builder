@@ -93,7 +93,7 @@ export default class JoinQueryBuilder implements JoinQueryBuilderInterface {
     return this;
   }
 
-  getJoins() {
+  _getJoins() {
     return this.#joins;
   }
 }
