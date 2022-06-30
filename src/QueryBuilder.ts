@@ -1,4 +1,4 @@
-import {From, RawSQL, Select, Where, OrderBy} from './clauses';
+import {From, RawSQL, Select, Where, OrderBy, Having} from './clauses';
 import {QueryCompiler} from './QueryCompiler';
 import {
   ColumnAlias,
@@ -8,6 +8,7 @@ import {
   WhereQueryBuilderCallback,
   JoinQueryBuilderCallback,
   SortDirection,
+  MathFunctions,
   QueryBuilder as QueryBuilderInterface
 } from '../types';
 
@@ -17,6 +18,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
   #tables: (From | RawSQL)[] = [];
   #wheres: (Where | RawSQL | string)[] = [];
   #joins: (RawSQL | JoinQueryBuilderCallback)[] = [];
+  #havings: (Having | RawSQL)[] = [];
   #groupByColumns: string[] = [];
   #orderByColumns: OrderBy[] = [];
   #distinctSelect: boolean = false;
@@ -68,7 +70,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
     column: string | Function,
     value: string | number | undefined | Array<string | number> | Function,
     comparisonOperator: ComparisonOperators | LogicalOperators,
-    logicalOperator: LogicalOperators
+    logicalOperator: 'AND' | 'OR'
   ) {
     // Nested where statement wrapped in parentheses
     if (column instanceof Function) {
@@ -269,6 +271,129 @@ export default class QueryBuilder implements QueryBuilderInterface {
     return this;
   }
 
+  having(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number,
+    mathFunction?: MathFunctions | undefined
+  ) {
+    this.#havings.push(
+      new Having(
+        column,
+        comparisonOperator,
+        value,
+        this.#havings.length ? 'AND' : null,
+        mathFunction
+      )
+    );
+    return this;
+  }
+
+  orHaving(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number,
+    mathFunction?: MathFunctions | undefined
+  ) {
+    this.#havings.push(
+      new Having(
+        column,
+        comparisonOperator,
+        value,
+        this.#havings.length ? 'OR' : null,
+        mathFunction
+      )
+    );
+    return this;
+  }
+
+  havingCount(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.having(column, comparisonOperator, value, 'COUNT');
+  }
+
+  orHavingCount(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.orHaving(column, comparisonOperator, value, 'COUNT');
+  }
+
+  havingMin(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.having(column, comparisonOperator, value, 'MIN');
+  }
+
+  orHavingMin(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.orHaving(column, comparisonOperator, value, 'MIN');
+  }
+
+  havingMax(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.having(column, comparisonOperator, value, 'MAX');
+  }
+
+  orHavingMax(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.orHaving(column, comparisonOperator, value, 'MAX');
+  }
+
+  havingAvg(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.having(column, comparisonOperator, value, 'AVG');
+  }
+
+  orHavingAvg(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.orHaving(column, comparisonOperator, value, 'AVG');
+  }
+
+  havingSum(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.having(column, comparisonOperator, value, 'SUM');
+  }
+
+  orHavingSum(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ) {
+    return this.orHaving(column, comparisonOperator, value, 'SUM');
+  }
+
+  havingRaw(sql: string, ...args: Array<string | number>) {
+    this.#havings.push(
+      new RawSQL(sql, args)
+    );
+    return this;
+  }
+
   groupBy(column: string) {
     this.#groupByColumns.push(column.trim());
     return this;
@@ -311,6 +436,10 @@ export default class QueryBuilder implements QueryBuilderInterface {
     return this.#joins;
   }
 
+  _getHavings() {
+    return this.#havings;
+  }
+
   _getGroupBy() {
     return this.#groupByColumns;
   }
@@ -334,6 +463,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
       this.#compiler.compileJoin(),
       this.#compiler.compileWere(),
       this.#compiler.compileGroupBy(),
+      this.#compiler.compileHaving(),
       this.#compiler.compileOrderBy(),
       this.#compiler.compileLimit(),
       this.#compiler.compileOffset(),

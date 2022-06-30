@@ -174,6 +174,46 @@ export class QueryCompiler {
     return clauses.join(' ');
   }
 
+  compileHaving() {
+    let clauses: string[] = [];
+    let includeHavingKeyword: boolean = true;
+
+    if (!this.#builder._getHavings().length) {
+      return null;
+    }
+
+    this.#builder
+      ._getHavings()
+      .forEach((having, i) => {
+        if (having instanceof RawSQL) {
+          if (i === 0) {
+            includeHavingKeyword = false;
+          }
+          return clauses.push(having.sql);
+        }
+
+        const {mathFunction, logicalOperator, comparisonOperator, column, value} = having;
+
+        if (mathFunction) {
+          return clauses.push(
+            this.getOperator(logicalOperator) + `${mathFunction}(${column}) ${comparisonOperator} ${escapeString(value)}`
+          );
+        }
+
+        clauses.push(
+          this.getOperator(logicalOperator) + `${column} ${comparisonOperator} ${escapeString(value)}`
+        );
+      });
+
+    const compiled = clauses.join(' ');
+
+    if (includeHavingKeyword) {
+      return 'HAVING ' + compiled;
+    }
+
+    return compiled;
+  }
+
   compileGroupBy() {
     return this.#builder._getGroupBy().length
       ? 'GROUP BY ' + this.#builder._getGroupBy().join(', ')
