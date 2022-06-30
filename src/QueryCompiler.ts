@@ -1,4 +1,3 @@
-import {format} from 'node:util';
 import {escapeString} from './util/string';
 import {LogicalOperators} from '../types';
 import {Join, RawSQL, Where} from './clauses';
@@ -101,33 +100,29 @@ export class QueryCompiler {
   }
 
   private compileWhereClause(where: Where) {
-    switch (where.comparisonOperator) {
+    const {column, value, comparisonOperator: comparison, logicalOperator: logical} = where;
+
+    switch (comparison) {
       case 'LIKE':
       case 'NOT LIKE':
-        return this.getOperator(where.logicalOperator)
-          // @ts-ignore
-          + `${where.column} ${where.comparisonOperator} ${escapeString(where.value.includes('%') ? where.value : `%${where.value}%`)}`;
+        return (typeof value === "string")
+          ? this.getOperator(logical) + `${column} ${comparison} ${escapeString(value.includes('%') ? value : `%${value}%`)}`
+          : '';
 
       case 'BETWEEN':
       case 'NOT BETWEEN':
-        // @ts-ignore
-        const [min, max] = where.value;
-        return this.getOperator(where.logicalOperator)
-          + `${where.column} ${where.comparisonOperator} ${escapeString(min)} AND ${escapeString(max)}`;
+        return (Array.isArray(value))
+          ? this.getOperator(logical) + `${column} ${comparison} ${escapeString(value[0])} AND ${escapeString(value[1])}`
+          : '';
 
       case 'IN':
       case 'NOT IN':
-        return this.getOperator(where.logicalOperator) + format(
-          `%s %s ('%s')`,
-          where.column,
-          where.comparisonOperator,
-          // @ts-ignore
-          where.value?.join(`','`)
-        );
+        return (Array.isArray(value))
+          ? this.getOperator(logical) + `${column} ${comparison} ('${value?.join(`','`)}')`
+          : '';
 
       default:
-        return this.getOperator(where.logicalOperator)
-          + `${where.column} ${where.comparisonOperator} ${escapeString(where.value)}`;
+        return this.getOperator(logical) + `${column} ${comparison} ${escapeString(value)}`;
     }
   }
 
