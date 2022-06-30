@@ -1,6 +1,5 @@
 import {From, RawSQL, Select, Where, OrderBy} from './clauses';
 import {QueryCompiler} from './QueryCompiler';
-import JoinQueryBuilder from './JoinQueryBuilder';
 import {
   ColumnAlias,
   ComparisonOperators,
@@ -14,7 +13,6 @@ import {
 
 export default class QueryBuilder implements QueryBuilderInterface {
   #compiler: QueryCompiler;
-  #joinBuilder: JoinQueryBuilder;
   #selects: (Select | RawSQL)[] = [];
   #tables: (From | RawSQL)[] = [];
   #wheres: (Where | RawSQL | string)[] = [];
@@ -27,7 +25,6 @@ export default class QueryBuilder implements QueryBuilderInterface {
 
   constructor() {
     this.#compiler = new QueryCompiler(this);
-    this.#joinBuilder = new JoinQueryBuilder();
   }
 
   from(table: string, alias?: string) {
@@ -223,7 +220,6 @@ export default class QueryBuilder implements QueryBuilderInterface {
 
   join(join: JoinQueryBuilderCallback) {
     this.#joins.push(join);
-
     return this;
   }
 
