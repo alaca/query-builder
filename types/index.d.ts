@@ -1,7 +1,3 @@
-export type DatabaseConfig = {
-  client: string
-}
-
 export type ColumnAlias = {
   [key: string]: string
 }
