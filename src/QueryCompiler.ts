@@ -163,6 +163,7 @@ export class QueryCompiler {
               )
             }
 
+            // JoinCondition
             clauses.push(
               `${join.logicalOperator} ${join.column1} ${join.comparisonOperator} ${join.quote ? escapeString(join.column2) : join.column2}`
             );
