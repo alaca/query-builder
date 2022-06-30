@@ -1,4 +1,4 @@
-import {QueryBuilder} from '../../src';
+import QueryBuilder from '../../src';
 
 test('select specific columns from table', () => {
   const sql = (new QueryBuilder())

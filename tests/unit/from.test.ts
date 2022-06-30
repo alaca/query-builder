@@ -1,4 +1,4 @@
-import {QueryBuilder} from '../../src';
+import QueryBuilder from '../../src';
 
 test('select from', () => {
   const sql = (new QueryBuilder())
