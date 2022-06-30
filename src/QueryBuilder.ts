@@ -64,7 +64,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
     return this;
   }
 
-  private setWhere(
+  #setWhere(
     column: string | Function,
     value: string | number | undefined | Array<string | number> | Function,
     comparisonOperator: ComparisonOperators | LogicalOperators,
@@ -108,7 +108,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
     value: string | number | QueryBuilderCallback | undefined = undefined,
     comparisonOperator: ComparisonOperators | LogicalOperators = '='
   ) {
-    return this.setWhere(column, value, comparisonOperator, 'AND');
+    return this.#setWhere(column, value, comparisonOperator, 'AND');
   }
 
   orWhere(
@@ -116,7 +116,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
     value: string | number | QueryBuilderCallback | undefined = undefined,
     comparisonOperator: ComparisonOperators | LogicalOperators = '='
   ) {
-    return this.setWhere(column, value, comparisonOperator, 'OR');
+    return this.#setWhere(column, value, comparisonOperator, 'OR');
   }
 
   whereLike(column: string, value: string) {
@@ -140,7 +140,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
     min: string | number,
     max: string | number
   ) {
-    return this.setWhere(column, [min, max], 'BETWEEN', 'AND');
+    return this.#setWhere(column, [min, max], 'BETWEEN', 'AND');
   }
 
   whereNotBetween(
@@ -148,7 +148,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
     min: string | number,
     max: string | number
   ) {
-    return this.setWhere(column, [min, max], 'NOT BETWEEN', 'AND');
+    return this.#setWhere(column, [min, max], 'NOT BETWEEN', 'AND');
   }
 
   orWhereBetween(
@@ -156,7 +156,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
     min: string | number,
     max: string | number
   ) {
-    return this.setWhere(column, [min, max], 'BETWEEN', 'OR');
+    return this.#setWhere(column, [min, max], 'BETWEEN', 'OR');
   }
 
   orWhereNotBetween(
@@ -164,35 +164,35 @@ export default class QueryBuilder implements QueryBuilderInterface {
     min: string | number,
     max: string | number
   ) {
-    return this.setWhere(column, [min, max], 'NOT BETWEEN', 'OR');
+    return this.#setWhere(column, [min, max], 'NOT BETWEEN', 'OR');
   }
 
   whereIn(
     column: string,
     value: Array<string | number> | QueryBuilderCallback
   ) {
-    return this.setWhere(column, value, 'IN', 'AND');
+    return this.#setWhere(column, value, 'IN', 'AND');
   }
 
   orWhereIn(
     column: string,
     value: Array<string | number> | QueryBuilderCallback
   ) {
-    return this.setWhere(column, value, 'IN', 'OR');
+    return this.#setWhere(column, value, 'IN', 'OR');
   }
 
   whereNotIn(
     column: string,
     value: Array<string | number> | QueryBuilderCallback
   ) {
-    return this.setWhere(column, value, 'NOT IN', 'AND');
+    return this.#setWhere(column, value, 'NOT IN', 'AND');
   }
 
   orWhereNotIn(
     column: string,
     value: Array<string | number> | QueryBuilderCallback
   ) {
-    return this.setWhere(column, value, 'NOT IN', 'OR');
+    return this.#setWhere(column, value, 'NOT IN', 'OR');
   }
 
   whereIsNull(column: string) {
