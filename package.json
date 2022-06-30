@@ -17,10 +17,17 @@
     "url": "git+https://github.com/alaca/query-builder.git"
   },
   "keywords": [
-    "SQL",
-    "Query Builder"
+    "db",
+    "sql",
+    "query",
+    "builder",
+    "querybuilder",
+    "database"
   ],
-  "author": "Ante Laca <ante.laca@gmail.com>",
+  "author": {
+    "name": "Ante Laca",
+    "web": "https://github.com/alaca"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/alaca/query-builder/issues"
