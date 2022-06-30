@@ -160,6 +160,90 @@ interface WhereQueryBuilderInterface {
   orWhereIsNotNull(column: string): QueryBuilder
 
   whereRaw(sql: string, ...args: Array<string | number>): QueryBuilder
+
+  having(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number,
+    mathFunction?: MathFunctions | undefined
+  ): QueryBuilder
+
+  orHaving(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number,
+    mathFunction?: MathFunctions | undefined
+  ): QueryBuilder
+
+  havingCount(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  orHavingCount(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  havingMin(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  orHavingMin(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  havingMax(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  orHavingMax(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  havingAvg(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  orHavingAvg(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  havingSum(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  orHavingSum(
+    column: string,
+    comparisonOperator: ComparisonOperators,
+    value: string | number
+  ): QueryBuilder
+
+  havingRaw(sql: string, ...args: Array<string | number>): QueryBuilder
+
+  groupBy(column: string): QueryBuilder
+
+  orderBy(column: string, direction: SortDirection = 'ASC'): QueryBuilder
+
+  limit(limit: number): QueryBuilder
+
+  offset(offset: number): QueryBuilder
 }
 
 interface JoinQueryBuilderInterface {
