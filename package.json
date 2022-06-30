@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alaca/querybuilder.git"
+    "url": "git+https://github.com/alaca/query-builder.git"
   },
   "keywords": [
     "SQL",
@@ -23,9 +23,9 @@
   "author": "Ante Laca <ante.laca@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/alaca/querybuilder/issues"
+    "url": "https://github.com/alaca/query-builder/issues"
   },
-  "homepage": "https://github.com/alaca/querybuilder#readme",
+  "homepage": "https://github.com/alaca/query-builder#readme",
   "devDependencies": {
     "@types/jest": "^28.1.3",
     "@types/node": "^18.0.0",
