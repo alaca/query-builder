@@ -139,3 +139,41 @@ test('where raw', () => {
 
   expect(sql).toBe("SELECT * FROM table WHERE something = 0");
 });
+
+test('where is null', () => {
+  const sql = (new QueryBuilder())
+    .from('table')
+    .whereIsNull('id')
+    .getSQL();
+
+  expect(sql).toBe("SELECT * FROM table WHERE id IS NULL");
+});
+
+test('where nested clause', () => {
+  const sql = (new QueryBuilder())
+    .from('table')
+    .where('status', 'published')
+    .orWhere(qb => {
+      qb
+        .where('status', 'draft')
+        .where('writing', 'locked')
+    })
+    .getSQL();
+
+  expect(sql).toBe("SELECT * FROM table WHERE status = 'published' OR (status = 'draft' AND writing = 'locked')");
+});
+
+
+test('where subquery', () => {
+  const sql = (new QueryBuilder())
+    .from('table')
+    .whereIn('id', qb => {
+      qb
+        .select('another_id')
+        .from('another_table')
+        .where('category', 'something')
+    })
+    .getSQL();
+
+  expect(sql).toBe("SELECT * FROM table WHERE id IN (SELECT another_id FROM another_table WHERE category = 'something')");
+});
