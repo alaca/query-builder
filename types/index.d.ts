@@ -40,6 +40,8 @@ export type JoinOperators =
   | 'AND'
   | 'OR';
 
+export type SortDirection = 'ASC' | 'DESC';
+
 export type QueryBuilder = QueryBuilderInterface & WhereQueryBuilderInterface
 
 interface QueryBuilderInterface {
@@ -77,8 +79,6 @@ interface QueryBuilderInterface {
   joinRaw(sql: string, ...args: Array<string | number>): QueryBuilder
 
   groupBy(column: string): QueryBuilder
-
-  groupByRaw(sql: string, ...args: Array<string | number>): QueryBuilder
 
   getSQL(): string
 }
