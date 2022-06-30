@@ -118,7 +118,7 @@ export class QueryCompiler {
       case 'IN':
       case 'NOT IN':
         return (Array.isArray(value))
-          ? this.getOperator(logical) + `${column} ${comparison} ('${value?.join(`','`)}')`
+          ? this.getOperator(logical) + `${column} ${comparison} (${value?.map(v => escapeString(v)).join(',')})`
           : '';
 
       default:
