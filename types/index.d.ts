@@ -165,6 +165,10 @@ interface QueryBuilderInterface {
 
   offset(offset: number): QueryBuilder
 
+  union(...unions: QueryBuilder[]): QueryBuilder
+
+  unionAll(...unions: QueryBuilder[]): QueryBuilder
+
   getSQL(): string
 }
 
