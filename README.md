@@ -25,6 +25,8 @@
     - [Grouping](#grouping)
     - [Limit & Offset](#limit--offset)
 
+- [Union](#union)
+
 ## Select
 
 #### Available methods - select / selectRaw / distinct
@@ -503,4 +505,63 @@ Generated SQL
 SELECT *
 FROM table
 LIMIT 10 OFFSET 10
+```
+
+## Union
+
+#### Available methods - union / unionAll
+
+**Union**
+
+```ts
+const builder1 = (new QueryBuilder())
+  .select('something')
+  .from('table');
+
+const sql = (new QueryBuilder())
+  .select('something_else')
+  .from('another_table')
+  .union(builder1)
+  .getSQL();
+```
+
+Generated SQL
+
+```sql
+SELECT something_else
+FROM another_table
+UNION
+SELECT something
+FROM table
+```
+
+**Union ALL**
+
+```ts
+const builder1 = (new QueryBuilder())
+  .select('something')
+  .from('table');
+
+const builder2 = (new QueryBuilder())
+  .select('another_thing')
+  .from('another_table');
+
+const sql = (new QueryBuilder())
+  .select('something_else')
+  .from('some_table')
+  .unionAll(builder1, builder2)
+  .getSQL();
+```
+
+Generated SQL
+
+```sql
+SELECT something_else
+FROM some_table
+UNION ALL
+SELECT something
+FROM table
+UNION ALL
+SELECT another_thing
+FROM another_table
 ```

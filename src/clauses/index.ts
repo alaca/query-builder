@@ -6,3 +6,4 @@ export {JoinCondition} from './JoinCondition';
 export {RawSQL} from './RawSQL';
 export {OrderBy} from './OrderBy';
 export {Having} from './Having';
+export {Union} from './Union';

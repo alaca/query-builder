@@ -1,4 +1,4 @@
-import {From, RawSQL, Select, Where, OrderBy, Having} from './clauses';
+import {From, RawSQL, Select, Where, OrderBy, Having, Union} from './clauses';
 import {QueryCompiler} from './QueryCompiler';
 import {
   ColumnAlias,
@@ -21,6 +21,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
   #havings: (Having | RawSQL)[] = [];
   #groupByColumns: string[] = [];
   #orderByColumns: OrderBy[] = [];
+  #unions: Union[] = [];
   #distinctSelect: boolean = false;
   #limitNumberRows: number | false = false;
   #offsetValue: number | false = false;
@@ -416,6 +417,24 @@ export default class QueryBuilder implements QueryBuilderInterface {
     return this;
   }
 
+  union(...unions: QueryBuilder[]) {
+    unions.forEach(builder => {
+      this.#unions.push(
+        new Union(builder)
+      )
+    });
+    return this;
+  }
+
+  unionAll(...unions: QueryBuilder[]) {
+    unions.forEach(builder => {
+      this.#unions.push(
+        new Union(builder, true)
+      )
+    });
+    return this;
+  }
+
   _isDistinct() {
     return this.#distinctSelect;
   }
@@ -456,6 +475,10 @@ export default class QueryBuilder implements QueryBuilderInterface {
     return this.#offsetValue;
   }
 
+  _getUnions() {
+    return this.#unions;
+  }
+
   getSQL() {
     const sql = [
       this.#compiler.compileSelect(),
@@ -467,6 +490,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
       this.#compiler.compileOrderBy(),
       this.#compiler.compileLimit(),
       this.#compiler.compileOffset(),
+      this.#compiler.compileUnion()
     ];
 
     return sql

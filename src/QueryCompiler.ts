@@ -250,6 +250,24 @@ export class QueryCompiler {
       : null;
   }
 
+  compileUnion() {
+    let unions: string[] = [];
+
+    if (!this.#builder._getUnions().length) {
+      return null;
+    }
+
+    this.#builder
+      ._getUnions()
+      .forEach((union) => {
+        unions.push(
+          (union.all ? 'UNION ALL ' : 'UNION ') + union.builder.getSQL()
+        );
+      });
+
+    return unions.join(' ');
+  }
+
   getOperator(operator: LogicalOperators | null): string {
     return operator
       ? operator + ' '
