@@ -81,86 +81,6 @@ interface QueryBuilderInterface {
 
   joinRaw(sql: string, ...args: Array<string | number>): QueryBuilder
 
-  groupBy(column: string): QueryBuilder
-
-  getSQL(): string
-}
-
-interface WhereQueryBuilderInterface {
-  where(
-    column: string | WhereQueryBuilderCallback,
-    value?: string | number | QueryBuilderCallback | undefined,
-    comparisonOperator?: ComparisonOperators | LogicalOperators
-  ): QueryBuilder
-
-  orWhere(
-    column: string | WhereQueryBuilderCallback,
-    value?: string | number | QueryBuilderCallback | null,
-    comparisonOperator?: ComparisonOperators | LogicalOperators
-  ): QueryBuilder
-
-  whereLike(column: string, value: string): QueryBuilder
-
-  orWhereLike(column: string, value: string): QueryBuilder
-
-  whereNotLike(column: string, value: string): QueryBuilder
-
-  orWhereNotLike(column: string, value: string): QueryBuilder
-
-  whereBetween(
-    column: string,
-    min: string | number,
-    max: string | number
-  ): QueryBuilder
-
-  whereNotBetween(
-    column: string,
-    min: string | number,
-    max: string | number
-  ): QueryBuilder
-
-  orWhereBetween(
-    column: string,
-    min: string | number,
-    max: string | number
-  ): QueryBuilder
-
-  orWhereNotBetween(
-    column: string,
-    min: string | number,
-    max: string | number
-  ): QueryBuilder
-
-  whereIn(
-    column: string,
-    value: Array<string | number> | QueryBuilderCallback
-  ): QueryBuilder
-
-  orWhereIn(
-    column: string,
-    value: Array<string | number> | QueryBuilderCallback
-  ): QueryBuilder
-
-  whereNotIn(
-    column: string,
-    value: Array<string | number> | QueryBuilderCallback
-  ): QueryBuilder
-
-  orWhereNotIn(
-    column: string,
-    value: Array<string | number> | QueryBuilderCallback
-  ): QueryBuilder
-
-  whereIsNull(column: string): QueryBuilder
-
-  orWhereIsNull(column: string): QueryBuilder
-
-  whereIsNotNull(column: string): QueryBuilder
-
-  orWhereIsNotNull(column: string): QueryBuilder
-
-  whereRaw(sql: string, ...args: Array<string | number>): QueryBuilder
-
   having(
     column: string,
     comparisonOperator: ComparisonOperators,
@@ -244,6 +164,84 @@ interface WhereQueryBuilderInterface {
   limit(limit: number): QueryBuilder
 
   offset(offset: number): QueryBuilder
+
+  getSQL(): string
+}
+
+interface WhereQueryBuilderInterface {
+  where(
+    column: string | WhereQueryBuilderCallback,
+    value?: string | number | QueryBuilderCallback | undefined,
+    comparisonOperator?: ComparisonOperators | LogicalOperators
+  ): QueryBuilder
+
+  orWhere(
+    column: string | WhereQueryBuilderCallback,
+    value?: string | number | QueryBuilderCallback | null,
+    comparisonOperator?: ComparisonOperators | LogicalOperators
+  ): QueryBuilder
+
+  whereLike(column: string, value: string): QueryBuilder
+
+  orWhereLike(column: string, value: string): QueryBuilder
+
+  whereNotLike(column: string, value: string): QueryBuilder
+
+  orWhereNotLike(column: string, value: string): QueryBuilder
+
+  whereBetween(
+    column: string,
+    min: string | number,
+    max: string | number
+  ): QueryBuilder
+
+  whereNotBetween(
+    column: string,
+    min: string | number,
+    max: string | number
+  ): QueryBuilder
+
+  orWhereBetween(
+    column: string,
+    min: string | number,
+    max: string | number
+  ): QueryBuilder
+
+  orWhereNotBetween(
+    column: string,
+    min: string | number,
+    max: string | number
+  ): QueryBuilder
+
+  whereIn(
+    column: string,
+    value: Array<string | number> | QueryBuilderCallback
+  ): QueryBuilder
+
+  orWhereIn(
+    column: string,
+    value: Array<string | number> | QueryBuilderCallback
+  ): QueryBuilder
+
+  whereNotIn(
+    column: string,
+    value: Array<string | number> | QueryBuilderCallback
+  ): QueryBuilder
+
+  orWhereNotIn(
+    column: string,
+    value: Array<string | number> | QueryBuilderCallback
+  ): QueryBuilder
+
+  whereIsNull(column: string): QueryBuilder
+
+  orWhereIsNull(column: string): QueryBuilder
+
+  whereIsNotNull(column: string): QueryBuilder
+
+  orWhereIsNotNull(column: string): QueryBuilder
+
+  whereRaw(sql: string, ...args: Array<string | number>): QueryBuilder
 }
 
 interface JoinQueryBuilderInterface {
