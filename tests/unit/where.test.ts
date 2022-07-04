@@ -134,10 +134,10 @@ test('where in string', () => {
 test('where raw', () => {
   const sql = (new QueryBuilder())
     .from('table')
-    .whereRaw('WHERE something = 0')
+    .whereRaw('WHERE something = %d and something_else = %s', '10', 'something')
     .getSQL();
 
-  expect(sql).toBe("SELECT * FROM table WHERE something = 0");
+  expect(sql).toBe("SELECT * FROM table WHERE something = 10 and something_else = 'something'");
 });
 
 test('where is null', () => {
