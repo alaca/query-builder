@@ -26,6 +26,10 @@ export function escapeString(val: any) {
     return val;
   }
 
+  if (!isNaN(val)) {
+    return parseInt(val);
+  }
+
   while ((match = CHARS_REGEXP.exec(val))) {
     escaped += val.slice(index, match.index) + CHARS_MAP[match[0]];
     index = CHARS_REGEXP.lastIndex;
