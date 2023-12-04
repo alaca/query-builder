@@ -1,2 +1,2 @@
-export {default} from './QueryBuilder';
+export {default} from './builder/QueryBuilder';
 export {escapeString} from './util/string';

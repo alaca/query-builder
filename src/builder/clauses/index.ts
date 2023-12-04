@@ -1,5 +1,6 @@
 export {Select} from './Select';
-export {From} from './From';
+export {SelectBuilder} from './SelectBuilder';
+export {Table} from './Table';
 export {Where} from './Where';
 export {Join} from './Join';
 export {JoinCondition} from './JoinCondition';
@@ -7,3 +8,4 @@ export {RawSQL} from './RawSQL';
 export {OrderBy} from './OrderBy';
 export {Having} from './Having';
 export {Union} from './Union';
+export {Data} from './Data';
