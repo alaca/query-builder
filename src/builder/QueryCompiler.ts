@@ -1,21 +1,21 @@
 import {escapeString} from '../util/string';
 import {LogicalOperators, Query} from './types';
-import {Join, RawSQL, SelectBuilder, Where} from './clauses';
+import {Join, RawSQL, SelectBuilder, Table, Where} from './clauses';
 import JoinQueryBuilder from './JoinQueryBuilder';
-import QueryBuilder from "./QueryBuilder";
+import QueryBuilder from './QueryBuilder';
 
 export class QueryCompiler {
-    #query: Query;
+    private query: Query;
 
     constructor(query: Query) {
-        this.#query = query;
+        this.query = query;
     }
 
     compileSelect() {
         const statements: string[] = [];
         let includeSelectKeyword: boolean = true;
 
-        this.#query.select
+        this.query.select
             .forEach((select, i) => {
                 if (select instanceof RawSQL) {
                     if (i === 0) {
@@ -42,7 +42,7 @@ export class QueryCompiler {
             : '*';
 
         if (includeSelectKeyword) {
-            return 'SELECT ' + (this.#query.distinct ? 'DISTINCT ' : '') + compiled;
+            return 'SELECT ' + (this.query.distinct ? 'DISTINCT ' : '') + compiled;
         }
 
         return compiled;
@@ -51,49 +51,38 @@ export class QueryCompiler {
     compileFrom() {
         const clauses: string[] = [];
 
-        this.#query.table
+        this.query.table
             .forEach((table) => {
                 if (table instanceof RawSQL) {
                     return clauses.push(table.sql);
                 }
 
                 if (table.alias) {
-                    return clauses.push(`${table.table} AS ${table.alias}`);
+                    return clauses.push(`${table.name} AS ${table.alias}`);
                 }
 
-                clauses.push(table.table);
+                clauses.push(table.name);
             });
 
         return 'FROM ' + clauses.join(', ');
     }
 
     compileInto() {
-        const tables: string[] = [];
+        const table: Table | RawSQL = this.query.table[0];
+        const tableName = table instanceof RawSQL ? table.sql : table.name;
 
-        this.#query.table
-            .every((table) => {
-                if (table instanceof RawSQL) {
-                    tables.push(table.sql);
-                    return false;
-                }
-
-                tables.push(table.table);
-
-                return false;
-            });
-
-        return 'INSERT INTO ' + tables[0];
+        return 'INSERT INTO ' + tableName;
     }
 
     compileWere(nestedStatement: boolean = false) {
         const clauses: string[] = [];
         let includeWhereKeyword: boolean = true;
 
-        if (!this.#query.where.length) {
+        if (!this.query.where.length) {
             return null;
         }
 
-        this.#query.where
+        this.query.where
             .forEach((where, i) => {
                 if (where instanceof RawSQL) {
                     if (i === 0) {
@@ -131,7 +120,7 @@ export class QueryCompiler {
         switch (comparison) {
             case 'LIKE':
             case 'NOT LIKE':
-                return (typeof value === "string")
+                return (typeof value === 'string')
                     ? this.getOperator(logical) + `${column} ${comparison} ${escapeString(value.includes('%') ? value : `%${value}%`)}`
                     : '';
 
@@ -155,11 +144,11 @@ export class QueryCompiler {
     compileJoin() {
         const clauses: string[] = [];
 
-        if (!this.#query.join.length) {
+        if (!this.query.join.length) {
             return null;
         }
 
-        this.#query.join
+        this.query.join
             .forEach((callback) => {
                 if (callback instanceof RawSQL) {
                     return clauses.push(callback.sql);
@@ -203,11 +192,11 @@ export class QueryCompiler {
         const clauses: string[] = [];
         let includeHavingKeyword: boolean = true;
 
-        if (!this.#query.having.length) {
+        if (!this.query.having.length) {
             return null;
         }
 
-        this.#query.having
+        this.query.having
             .forEach((having, i) => {
                 if (having instanceof RawSQL) {
                     if (i === 0) {
@@ -239,19 +228,19 @@ export class QueryCompiler {
     }
 
     compileGroupBy() {
-        return this.#query.groupBy.length
-            ? 'GROUP BY ' + this.#query.groupBy.join(', ')
+        return this.query.groupBy.length
+            ? 'GROUP BY ' + this.query.groupBy.join(', ')
             : null;
     }
 
     compileOrderBy() {
         const statements: string[] = [];
 
-        if (!this.#query.orderBy.length) {
+        if (!this.query.orderBy.length) {
             return null;
         }
 
-        this.#query.orderBy
+        this.query.orderBy
             .forEach((order) => {
                 statements.push(
                     `${order.column} ${order.direction}`,
@@ -262,25 +251,25 @@ export class QueryCompiler {
     }
 
     compileLimit() {
-        return this.#query.limit
-            ? 'LIMIT ' + this.#query.limit
+        return this.query.limit
+            ? 'LIMIT ' + this.query.limit
             : null;
     }
 
     compileOffset() {
-        return this.#query.limit && this.#query.offset
-            ? 'OFFSET ' + this.#query.offset
+        return this.query.limit && this.query.offset
+            ? 'OFFSET ' + this.query.offset
             : null;
     }
 
     compileUnion() {
         const unions: string[] = [];
 
-        if (!this.#query.union.length) {
+        if (!this.query.union.length) {
             return null;
         }
 
-        this.#query.union
+        this.query.union
             .forEach((union) => {
                 unions.push(
                     (union.all ? 'UNION ALL ' : 'UNION ') + union.builder.getSQL(),
@@ -335,7 +324,7 @@ export class QueryCompiler {
     }
 
     getQueryType(): string {
-        return this.#query.type || 'SELECT';
+        return this.query.type || 'SELECT';
     }
 
     getOperator(operator: LogicalOperators | null): string {

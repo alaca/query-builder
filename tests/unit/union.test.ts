@@ -1,13 +1,11 @@
-import QueryBuilder from '../../src';
+import DB from '../../src';
 
 test('union', () => {
-    const builder1 = (new QueryBuilder())
-        .select('something')
-        .from('table');
+    const builder1 = DB.table('table')
+        .select('something');
 
-    const sql = (new QueryBuilder())
+    const sql = DB.table('another_table')
         .select('something_else')
-        .from('another_table')
         .union(builder1)
         .getSQL();
 
@@ -15,17 +13,11 @@ test('union', () => {
 });
 
 test('union all', () => {
-    const builder1 = (new QueryBuilder())
-        .select('something')
-        .from('table');
+    const builder1 = DB.table('table').select('something');
+    const builder2 = DB.table('another_table').select('another_thing');
 
-    const builder2 = (new QueryBuilder())
-        .select('another_thing')
-        .from('another_table');
-
-    const sql = (new QueryBuilder())
+    const sql = DB.table('some_table')
         .select('something_else')
-        .from('some_table')
         .unionAll(builder1, builder2)
         .getSQL();
 

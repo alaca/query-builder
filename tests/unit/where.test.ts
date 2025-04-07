@@ -1,8 +1,7 @@
-import QueryBuilder from '../../src';
+import DB from '../../src';
 
 test('where', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .where('id', 10)
         .getSQL();
 
@@ -10,8 +9,7 @@ test('where', () => {
 });
 
 test('where and where', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .where('id', 10)
         .where('status', 'published')
         .getSQL();
@@ -20,8 +18,7 @@ test('where and where', () => {
 });
 
 test('where or where', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .where('status', 'published')
         .orWhere('status', 'completed')
         .getSQL();
@@ -30,8 +27,7 @@ test('where or where', () => {
 });
 
 test('where like', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereLike('status', 'something')
         .getSQL();
 
@@ -39,8 +35,7 @@ test('where like', () => {
 });
 
 test('where like left wild card', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereLike('status', '%something')
         .getSQL();
 
@@ -48,8 +43,7 @@ test('where like left wild card', () => {
 });
 
 test('where like right wild card', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereLike('status', 'something%')
         .getSQL();
 
@@ -57,8 +51,7 @@ test('where like right wild card', () => {
 });
 
 test('where like or like', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereLike('status', 'something')
         .orWhereLike('status', 'some other thing')
         .getSQL();
@@ -67,8 +60,7 @@ test('where like or like', () => {
 });
 
 test('where not like', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereNotLike('status', 'something')
         .getSQL();
 
@@ -76,8 +68,7 @@ test('where not like', () => {
 });
 
 test('where not like or not like', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereNotLike('status', 'something')
         .orWhereNotLike('status', 'some other thing')
         .getSQL();
@@ -86,8 +77,7 @@ test('where not like or not like', () => {
 });
 
 test('where between', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereBetween('id', 10, 100)
         .getSQL();
 
@@ -95,8 +85,7 @@ test('where between', () => {
 });
 
 test('where between or between', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereBetween('id', 10, 100)
         .orWhereBetween('id', 200, 300)
         .getSQL();
@@ -105,8 +94,7 @@ test('where between or between', () => {
 });
 
 test('where not between', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereNotBetween('id', 10, 100)
         .getSQL();
 
@@ -114,8 +102,7 @@ test('where not between', () => {
 });
 
 test('where in', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereIn('id', [10, 100])
         .getSQL();
 
@@ -123,8 +110,7 @@ test('where in', () => {
 });
 
 test('where in string', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereIn('status', ['open', 'closed'])
         .getSQL();
 
@@ -132,17 +118,15 @@ test('where in string', () => {
 });
 
 test('where raw', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
-        .whereRaw('WHERE something = %d and something_else = %s', '10', 'something')
+    const sql = DB.table('table')
+        .whereRaw('WHERE something = %d and something_else = %s', 10, 'something')
         .getSQL();
 
     expect(sql).toBe("SELECT * FROM table WHERE something = 10 and something_else = 'something'");
 });
 
 test('where is null', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereIsNull('id')
         .getSQL();
 
@@ -150,8 +134,7 @@ test('where is null', () => {
 });
 
 test('where nested clause', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .where('status', 'published')
         .orWhere(qb => {
             qb
@@ -165,12 +148,11 @@ test('where nested clause', () => {
 
 
 test('where subquery', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .whereIn('id', qb => {
             qb
+                .table('another_table')
                 .select('another_id')
-                .from('another_table')
                 .where('category', 'something');
         })
         .getSQL();

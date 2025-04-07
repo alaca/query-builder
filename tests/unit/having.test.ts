@@ -1,8 +1,7 @@
-import QueryBuilder from '../../src';
+import DB from '../../src';
 
 test('having', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .having('id', '>', 10)
         .getSQL();
@@ -11,8 +10,7 @@ test('having', () => {
 });
 
 test('having count', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingCount('id', '>', 10)
         .getSQL();
@@ -21,8 +19,7 @@ test('having count', () => {
 });
 
 test('having count and', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingCount('id', '>', 10)
         .havingCount('id', '<', 100)
@@ -32,8 +29,7 @@ test('having count and', () => {
 });
 
 test('having count or', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingCount('id', '>', 10)
         .orHavingCount('id', '<', 100)
@@ -43,8 +39,7 @@ test('having count or', () => {
 });
 
 test('having sum', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingSum('id', '>', 10)
         .getSQL();
@@ -53,8 +48,7 @@ test('having sum', () => {
 });
 
 test('having sum and', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingSum('id', '>', 10)
         .havingSum('id', '<', 100)
@@ -64,8 +58,7 @@ test('having sum and', () => {
 });
 
 test('having sum or', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingSum('id', '>', 10)
         .orHavingSum('id', '<', 100)
@@ -75,8 +68,7 @@ test('having sum or', () => {
 });
 
 test('having avg', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingAvg('id', '>', 10)
         .getSQL();
@@ -85,8 +77,7 @@ test('having avg', () => {
 });
 
 test('having avg and', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingAvg('id', '>', 10)
         .havingAvg('id', '<', 100)
@@ -96,8 +87,7 @@ test('having avg and', () => {
 });
 
 test('having avg or', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingAvg('id', '>', 10)
         .orHavingAvg('id', '<', 100)
@@ -107,8 +97,7 @@ test('having avg or', () => {
 });
 
 test('having min', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingMin('id', '>', 10)
         .getSQL();
@@ -117,8 +106,7 @@ test('having min', () => {
 });
 
 test('having min and', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingMin('id', '>', 10)
         .havingMin('id', '<', 100)
@@ -128,8 +116,7 @@ test('having min and', () => {
 });
 
 test('having min or', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingMin('id', '>', 10)
         .orHavingMin('id', '<', 100)
@@ -139,8 +126,7 @@ test('having min or', () => {
 });
 
 test('having max', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingMax('id', '>', 10)
         .getSQL();
@@ -149,8 +135,7 @@ test('having max', () => {
 });
 
 test('having max and', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingMax('id', '>', 10)
         .havingMax('id', '<', 100)
@@ -160,8 +145,7 @@ test('having max and', () => {
 });
 
 test('having max or', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingMax('id', '>', 10)
         .orHavingMax('id', '<', 100)
@@ -171,8 +155,7 @@ test('having max or', () => {
 });
 
 test('having min and max', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .havingMin('id', '>', 10)
         .havingMax('id', '<', 100)

@@ -1,8 +1,7 @@
-import QueryBuilder from '../../src';
+import DB from '../../src';
 
 test('advanced join', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .join(qb => {
             qb
                 .leftJoin('another_table')
@@ -16,8 +15,7 @@ test('advanced join', () => {
 });
 
 test('left join', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .leftJoin('another_table', 'id', 'another_id')
         .getSQL();
 
@@ -25,8 +23,7 @@ test('left join', () => {
 });
 
 test('left join alias', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .leftJoin('another_table', 'id', 'another_id', 'at')
         .getSQL();
 
@@ -34,8 +31,7 @@ test('left join alias', () => {
 });
 
 test('right join', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .rightJoin('another_table', 'id', 'another_id')
         .getSQL();
 
@@ -43,8 +39,7 @@ test('right join', () => {
 });
 
 test('right join alias', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .rightJoin('another_table', 'id', 'another_id', 'at')
         .getSQL();
 
@@ -53,8 +48,7 @@ test('right join alias', () => {
 
 
 test('inner join', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .innerJoin('another_table', 'id', 'another_id')
         .getSQL();
 
@@ -62,8 +56,7 @@ test('inner join', () => {
 });
 
 test('inner join alias', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .innerJoin('another_table', 'id', 'another_id', 'at')
         .getSQL();
 
@@ -71,8 +64,7 @@ test('inner join alias', () => {
 });
 
 test('join raw', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .joinRaw('LEFT JOIN another_table ON a = b')
         .getSQL();
 

@@ -1,8 +1,7 @@
-import QueryBuilder from '../../src';
+import DB from '../../src';
 
 test('group by column', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .getSQL();
 
@@ -11,8 +10,7 @@ test('group by column', () => {
 
 
 test('group by multiple columns', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .groupBy('id')
         .groupBy('column_one')
         .getSQL();

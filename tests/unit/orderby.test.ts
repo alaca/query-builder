@@ -1,8 +1,7 @@
-import QueryBuilder from '../../src';
+import DB from '../../src';
 
 test('order by column asc', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .orderBy('id')
         .getSQL();
 
@@ -10,8 +9,7 @@ test('order by column asc', () => {
 });
 
 test('order by column desc', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .orderBy('id', 'DESC')
         .getSQL();
 
@@ -19,8 +17,7 @@ test('order by column desc', () => {
 });
 
 test('order by multiple columns', () => {
-    const sql = (new QueryBuilder())
-        .from('table')
+    const sql = DB.table('table')
         .orderBy('id')
         .orderBy('column_one', 'DESC')
         .getSQL();

@@ -16,7 +16,7 @@ import {
 } from './types';
 
 export default class QueryBuilder implements QueryBuilderInterface {
-    #compiler: QueryCompiler;
+    private compiler: QueryCompiler;
 
     protected query: Query = {
         type: null,
@@ -35,19 +35,12 @@ export default class QueryBuilder implements QueryBuilderInterface {
     };
 
     constructor() {
-        this.#compiler = new QueryCompiler(this.query);
+        this.compiler = new QueryCompiler(this.query);
     }
 
-    from(table: string, alias?: string) {
+    table(table: string, alias?: string) {
         this.query.table.push(
             new Table(table, alias),
-        );
-        return this;
-    }
-
-    into(table: string) {
-        this.query.table.push(
-            new Table(table),
         );
         return this;
     }
@@ -55,9 +48,9 @@ export default class QueryBuilder implements QueryBuilderInterface {
     select(...columns: (string | Column)[]) {
         this.setQueryType('SELECT');
 
-        columns.map(column => {
+        columns.forEach(column => {
             if (column instanceof Object) {
-                return Object.entries(column).map(([name, value]) => {
+                Object.entries(column).map(([name, value]) => {
                     // subquery
                     if (value instanceof Function) {
                         this.query.select.push(
@@ -71,11 +64,11 @@ export default class QueryBuilder implements QueryBuilderInterface {
                         );
                     }
                 });
+            } else {
+                this.query.select.push(
+                    new Select(column),
+                );
             }
-
-            this.query.select.push(
-                new Select(column),
-            );
         });
 
         return this;
@@ -157,8 +150,8 @@ export default class QueryBuilder implements QueryBuilderInterface {
             const builder = new QueryBuilder();
             column(builder);
 
-            const sql = (this.query.where.length > 0 ? this.#compiler.getOperator(logicalOperator) : '')
-                + `(${builder.#compiler.compileWere(true)})`;
+            const sql = (this.query.where.length > 0 ? this.compiler.getOperator(logicalOperator) : '')
+                + `(${builder.compiler.compileWere(true)})`;
 
             this.query.where.push(sql);
         }
@@ -168,7 +161,7 @@ export default class QueryBuilder implements QueryBuilderInterface {
 
             value(builder);
 
-            const sql = (this.query.where.length > 0 ? this.#compiler.getOperator(logicalOperator) : '')
+            const sql = (this.query.where.length > 0 ? this.compiler.getOperator(logicalOperator) : '')
                 + `${column} ${comparisonOperator} (${builder.getSQL()})`;
 
             this.query.where.push(sql);
@@ -537,6 +530,6 @@ export default class QueryBuilder implements QueryBuilderInterface {
     }
 
     getSQL() {
-        return this.#compiler.compile();
+        return this.compiler.compile();
     }
 }

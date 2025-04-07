@@ -73,7 +73,7 @@ export type Query = {
 }
 
 interface QueryBuilderInterface {
-    from(table: string, alias?: string): QueryBuilder;
+    table(table: string, alias?: string): QueryBuilder;
 
     select(...columns: (string | ColumnAlias)[]): QueryBuilder;
 

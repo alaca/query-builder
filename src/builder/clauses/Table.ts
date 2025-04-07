@@ -1,9 +1,9 @@
 export class Table {
-    table: string;
+    name: string;
     alias?: string;
 
     constructor(table: string, alias?: string) {
-        this.table = table.trim();
+        this.name = table.trim();
         this.alias = alias?.trim();
     }
 }
